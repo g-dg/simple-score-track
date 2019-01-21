@@ -1,0 +1,79 @@
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: sans-serif;
+}
+
+.error {
+	color: red;
+}
+
+table.scores {
+	/*border-collapse: collapse;*/
+	border: 1px black solid;
+}
+table.scores th,
+table.scores td {
+	background-color: white;
+	border: 1px black solid;
+	padding: 4px 8px;
+	text-align: center;
+}
+table.scores th {
+	padding: 8px;
+	position: -webkit-sticky;
+	position: sticky;
+	top: 0px;
+}
+table.scores th:first-child,
+table.scores td:first-child {
+	position: sticky;
+	left: 0px;
+}
+table.scores td.empty {
+	background-color: #fcc;
+}
+table.scores td.zero {
+	background-color: #ffc;
+}
+table.scores td.score {
+	background-color: #cfc;
+}
+table.scores tr:active td,
+table.scores tr:hover td {
+	background-color: #ccc;
+}
+table.scores tr:active td.empty,
+table.scores tr:hover td.empty {
+	background-color: #f99;
+}
+table.scores tr:active td.zero,
+table.scores tr:hover td.zero {
+	background-color: #ff9;
+}
+table.scores tr:active td.score,
+table.scores tr:hover td.score {
+	background-color: #9f9;
+}
+
+table.ranking {
+	border-collapse: collapse;
+}
+table.ranking th,
+table.ranking td {
+	border: 1px black solid;
+	padding: 4px 8px;
+}
+table.ranking tr.first-place {
+	background-color: #f99;
+}
+table.ranking tr.second-place {
+	background-color: #ff9;
+}
+table.ranking tr.third-place {
+	background-color: #9f9;
+}
