@@ -8,6 +8,37 @@ if (!isset($_SESSION['user_id'])) {
 	exit();
 }
 
+require_once('database.php');
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf_token']) && $_POST['_csrf_token'] === $_SESSION['csrf_token']) {
+	switch ($_GET['action']) {
+		case 'data_delete_all':
+			if (isset($_POST['confirm_code'])) {
+				if ($_POST['confirm_code'] === $_SESSION['confirmation_code']) {
+					try {
+						database_query('DELETE FROM "scores";');
+						database_query('DELETE FROM "events";');
+						database_query('DELETE FROM "teams";');
+						database_query('DELETE FROM "clubs";');
+						$_SESSION['import_export_error'] = 'All data deleted.';
+					} catch (Exception $e) {
+						$_SESSION['import_export_error'] = 'An error occurred while deleting the data.';
+					}
+				} else {
+					$_SESSION['import_export_error'] = 'Confirmation code incorrect, data not deleted';
+				}
+			} else {
+				http_response_code(400);
+			}
+			break;
+		default:
+			$_SESSION['import_export_error'] = 'An error occurred.';
+			http_response_code(400);
+	}
+	header('Location: import_export.php');
+	exit();
+}
+
 require_once('template.php');
 
 template_header('Import/Export Data');
@@ -83,6 +114,19 @@ echo '</code> ';
 echo '<br />';
 echo '<input name="confirm_code" type="text" placeholder="Confirmation Code" required="required" />';
 echo '<input type="submit" value="Import" onclick="return confirm(&quot;Really import the file? This can delete **ALL** events, clubs, teams, and scores.&quot;);" />';
+echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
+echo '</form>';
+
+echo '<h2>Delete All Data</h2>';
+echo '<form action="import_export.php?action=data_delete_all" method="post">';
+echo '<strong>WARNING: THIS WILL DELETE ALL CLUBS, TEAMS, EVENTS, AND SCORES</strong><br />';
+echo 'To delete all data, enter the following code in the textbox:';
+echo ' <code>';
+echo htmlescape($_SESSION['confirmation_code']);
+echo '</code> ';
+echo '<br />';
+echo '<input name="confirm_code" type="text" placeholder="Confirmation Code" required="required" />';
+echo '<input type="submit" value="Delete All Data" onclick="return confirm(&quot;Really delete **ALL** data (This won\'t delete users)?&quot;);" />';
 echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
 echo '</form>';
 
