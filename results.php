@@ -118,29 +118,31 @@ echo '<hr /><h1>Overall Team Rankings</h1>';
 
 /*
 SELECT
-	"scores"."team" AS "team_id",
+	"clubs"."id" AS "club_id",
 	"clubs"."name" AS "club_name",
+	"teams"."id" AS "team_id",
 	"teams"."name" AS "team_name",
-	TOTAL("scores"."points" * "events"."overall_point_multiplier") AS "overall_points"
-FROM "scores"
-INNER JOIN "events" ON "events"."id" = "scores"."event"
-INNER JOIN "teams" ON "teams"."id" = "scores"."team"
+	TOTAL("scores"."points" * "events"."overall_point_multiplier") AS "total_points"
+FROM "teams"
 INNER JOIN "clubs" ON "clubs"."id" = "teams"."club"
-GROUP BY "events"."team"
-ORDER BY 
-	"overall_points" DESC,
-	"clubs"."name", "teams"."name";
+LEFT JOIN "scores" ON "scores"."team" = "teams"."id"
+LEFT JOIN "events" ON "events"."id" = "scores"."event"
+GROUP BY "teams"."id"
+ORDER BY
+	"total_points" DESC,
+	"clubs"."name",
+	"teams"."name";
  */
-$scores = database_query('SELECT "scores"."team" AS "team_id", "clubs"."name" AS "club_name", "teams"."name" AS "team_name", TOTAL("scores"."points" * "events"."overall_point_multiplier") AS "overall_points" FROM "scores" INNER JOIN "events" ON "events"."id" = "scores"."event" INNER JOIN "teams" ON "teams"."id" = "scores"."team" INNER JOIN "clubs" ON "clubs"."id" = "teams"."club" GROUP BY "scores"."team" ORDER BY "overall_points" DESC, "clubs"."name", "teams"."name";');
+$scores = database_query('SELECT "clubs"."id" AS "club_id","clubs"."name" AS "club_name","teams"."id" AS "team_id","teams"."name" AS "team_name",TOTAL("scores"."points"*"events"."overall_point_multiplier") AS "total_points" FROM "teams" INNER JOIN "clubs" ON "clubs"."id"="teams"."club" LEFT JOIN "scores" ON "scores"."team"="teams"."id" LEFT JOIN "events" ON "events"."id"="scores"."event" GROUP BY "teams"."id" ORDER BY "total_points" DESC,"clubs"."name","teams"."name";');
 if (count($scores) > 0) {
 	echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Team</th><th>Score</th></tr></thead><tbody>';
 	$rank = 1;
-	$highest_score = (float)$scores[0]['overall_points'];
+	$highest_score = (float)$scores[0]['total_points'];
 	foreach ($scores as $score) {
 		// check if next rank (i.e. not tied)
-		if (round((float)$score['overall_points'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
+		if (round((float)$score['total_points'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
 			$rank++;
-			$highest_score = $score['overall_points'];
+			$highest_score = $score['total_points'];
 		}
 		switch ($rank) {
 			case 1:
@@ -162,7 +164,7 @@ if (count($scores) > 0) {
 		echo '</td><td>';
 		echo htmlescape($score['team_name']);
 		echo '</td><td>';
-		echo htmlescape(round($score['overall_points'], 2));
+		echo htmlescape(round($score['total_points'], 2));
 		echo '</td></tr>';
 	}
 	echo '</tbody></table>';
