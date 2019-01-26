@@ -65,6 +65,16 @@ if (isset($_SESSION['scores_error'])) {
 	unset($_SESSION['scores_error']);
 }
 
+$stats = database_query('SELECT "score_entries","club_count","team_count","event_count" FROM (SELECT COUNT() AS "score_entries" FROM "scores") JOIN (SELECT COUNT() AS "club_count" FROM "clubs") JOIN (SELECT COUNT() AS "team_count" FROM "teams") JOIN (SELECT COUNT() AS "event_count" FROM "events");')[0];
+
+echo '<strong>Completion: ';
+if (((int)$stats['team_count'] * (int)$stats['event_count']) > 0) {
+	echo htmlescape(number_format(round(((int)$stats['score_entries'] / ((int)$stats['team_count'] * (int)$stats['event_count'])) * 100, 2), 2) . '%');
+} else {
+	echo 'N/A';
+}
+echo '</strong>';
+
 echo '<h2>Add/Update Scores</h2>';
 
 $events = database_query('SELECT "id", "name" FROM "events" ORDER BY "name";');
