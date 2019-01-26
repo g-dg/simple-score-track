@@ -52,37 +52,36 @@ echo '<hr /><h1>Overall Club Average Rankings</h1>';
 
 /*
 SELECT
-	"club_id",
-	"club_name",
-	AVG("total_points") AS "average_points"
-FROM (
+	"clubs"."id" AS "club_id",
+	"clubs"."name" AS "club_name",
+	IFNULL(AVG("team_totals"."total_points"), 0.0) AS "average_overall_points"
+FROM "clubs"
+LEFT JOIN (
 	SELECT
-		"clubs"."id" AS "club_id",
 		"teams"."id" AS "team_id",
-		"clubs"."name" AS "club_name",
 		"teams"."name" AS "team_name",
+		"teams"."club" AS "club_id",
 		TOTAL("scores"."points" * "events"."overall_point_multiplier") AS "total_points"
 	FROM "teams"
-	INNER JOIN "clubs" ON "clubs"."id" = "teams"."club"
 	LEFT JOIN "scores" ON "scores"."team" = "teams"."id"
 	LEFT JOIN "events" ON "events"."id" = "scores"."event"
-	GROUP BY "scores"."team"
-)
-GROUP BY "club_id"
+	GROUP BY "teams"."id"
+) AS "team_totals" ON "club_id" = "clubs"."id"
+GROUP BY "clubs"."id"
 ORDER BY
-	"average_points" DESC,
+	"average_overall_points" DESC,
 	"club_name";
  */
-$scores = database_query('SELECT "club_id","club_name",AVG("total_points") AS "overall_points" FROM (SELECT "clubs"."id" AS "club_id","teams"."id" AS "team_id","clubs"."name" AS "club_name","teams"."name" AS "team_name",TOTAL("scores"."points" * "events"."overall_point_multiplier") AS "total_points" FROM "teams" INNER JOIN "clubs" ON "clubs"."id"="teams"."club" LEFT JOIN "scores" ON "scores"."team"="teams"."id" LEFT JOIN "events" ON "events"."id"="scores"."event" GROUP BY "scores"."team")GROUP BY "club_id" ORDER BY "overall_points" DESC,"club_name";');
+$scores = database_query('SELECT "clubs"."id" AS "club_id","clubs"."name" AS "club_name",IFNULL(AVG("total_points"),0.0) AS "average_overall_points" FROM "clubs" LEFT JOIN (SELECT "teams"."id" AS "team_id","teams"."name" AS "team_name","teams"."club" AS "club_id",TOTAL("scores"."points"*"events"."overall_point_multiplier") AS "total_points" FROM "teams" LEFT JOIN "scores" ON "scores"."team"="teams"."id" LEFT JOIN "events" ON "events"."id"="scores"."event" GROUP BY "teams"."id") AS "team_totals" ON "club_id"="clubs"."id" GROUP BY "clubs"."id" ORDER BY "average_overall_points" DESC,"club_name";');
 if (count($scores) > 0) {
 	echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Score</th></tr></thead><tbody>';
 	$rank = 1;
-	$highest_score = (float)$scores[0]['overall_points'];
+	$highest_score = (float)$scores[0]['average_overall_points'];
 	foreach ($scores as $score) {
 		// check if next rank (i.e. not tied)
-		if (round((float)$score['overall_points'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
+		if (round((float)$score['average_overall_points'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
 			$rank++;
-			$highest_score = $score['overall_points'];
+			$highest_score = $score['average_overall_points'];
 		}
 		switch ($rank) {
 			case 1:
@@ -102,7 +101,7 @@ if (count($scores) > 0) {
 		echo '</td><td>';
 		echo htmlescape($score['club_name']);
 		echo '</td><td>';
-		echo htmlescape(number_format(round($score['overall_points'], 2), 2));
+		echo htmlescape(number_format(round($score['average_overall_points'], 2), 2));
 		echo '</td></tr>';
 	}
 	echo '</tbody></table>';
