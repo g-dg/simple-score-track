@@ -7,9 +7,11 @@ About
 This is a simple score tracker, created to allow for input by multiple people at the same time. It supports:
 - multiple clubs with multiple teams
 - multiple events
+- a simple mobile-friendly score input and a "everything on one page" score overview and editor
 - per-event rankings
 - per-team rankings
-- per-club overall rankings
+- overall rankings (per-club, shows which clubs did better overall)
+- per-club event rankings (shows what needs to be worked on in each club)
 - point multipliers on events for overall calculations (if an event should not count or count more in the overall results)
 - export to and import from CSV files
 - data backup and restore
