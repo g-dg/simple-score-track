@@ -4,7 +4,7 @@ require_once('session.php');
 
 // force logon
 if (!isset($_SESSION['user_id'])) {
-	header('Location: login.php?redirect=scores.php');
+	header('Location: login.php?redirect=scores_overview.php');
 	exit();
 }
 
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			$_SESSION['scores_error'] = 'An error occurred.';
 			http_response_code(400);
 	}
-	header('Location: scores.php');
+	header('Location: scores_overview.php');
 	exit();
 }
 
@@ -120,7 +120,7 @@ foreach ($teams as $team) {
 			echo '<td class="empty">';
 		}
 
-		echo '<form action="scores.php?action=score_update&amp;team_id=' . htmlescape(urlencode($team['id'])) . '&amp;event_id=' . htmlescape(urlencode($event['id'])) . '" method="post">';
+		echo '<form action="scores_overview.php?action=score_update&amp;team_id=' . htmlescape(urlencode($team['id'])) . '&amp;event_id=' . htmlescape(urlencode($event['id'])) . '" method="post">';
 		echo '<input name="score" value="' . htmlescape($score) . '" type="number" min="0" step="0.01" />';
 		echo '<input type="submit" value="Save" />';
 		echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
@@ -141,7 +141,7 @@ for ($i = 0; $i < 8; $i++) {
 }
 
 echo '<h2>Delete All Scores</h2>';
-echo '<form action="scores.php?action=score_delete_all" method="post">';
+echo '<form action="scores_overview.php?action=score_delete_all" method="post">';
 echo 'To delete all scores, enter the following code in the textbox:';
 echo ' <code>';
 echo htmlescape($_SESSION['confirmation_code']);
