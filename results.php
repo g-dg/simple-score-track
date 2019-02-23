@@ -42,13 +42,13 @@ echo '</strong></li>';
 echo '<li>Clubs: ' . htmlescape($stats['club_count']) . '</li>';
 echo '<li>Teams: ' . htmlescape($stats['team_count']) . '</li>';
 echo '<li>Events: ' . htmlescape($stats['event_count']) . '</li>';
-echo '</ul><br />';
+echo '</ul>';
 
 
 /******************************************************************************/
 // Overall Club Average Rankings
 
-echo '<hr /><h1>Overall Club Average Rankings</h1>';
+echo '<br /><hr /><h1>Overall Club Average Rankings</h1>';
 
 /*
 SELECT
@@ -108,13 +108,12 @@ if (count($scores) > 0) {
 } else {
 	echo 'No results.';
 }
-echo '<br />';
 
 
 /******************************************************************************/
 // Overall Team Rankings
 
-echo '<hr /><h1>Overall Team Rankings</h1>';
+echo '<br /><hr /><h1>Overall Team Rankings</h1>';
 
 /*
 SELECT
@@ -171,13 +170,12 @@ if (count($scores) > 0) {
 } else {
 	echo 'No results.<br />';
 }
-echo '<br />';
 
 
 /******************************************************************************/
 // Team Event Rankings
 
-echo '<hr /><h1>Team Event Rankings</h1>';
+echo '<br /><hr /><h1>Team Event Rankings</h1>';
 
 /*
 SELECT
@@ -237,10 +235,9 @@ if (count($events) > 0) {
 		} else {
 			echo 'No results.<br />';
 		}
-		echo '<br />';
 	}
 } else {
-	echo 'No events.<br />';
+	echo 'No events.';
 }
 
 /******************************************************************************/

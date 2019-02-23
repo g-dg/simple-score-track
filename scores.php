@@ -72,7 +72,7 @@ if (isset($_SESSION['scores_error'])) {
 	unset($_SESSION['scores_error']);
 }
 
-echo '<form id="score_form" action="scores.php" method="post">';
+echo '<form id="score_form" action="scores.php" method="post" class="form">';
 
 echo '<input id="csrf_token" name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
 
@@ -80,37 +80,68 @@ $events = database_query('SELECT "id", "name" FROM "events" ORDER BY "name";');
 usort($events, function ($a, $b) {
 	return strnatcasecmp($a['name'], $b['name']);
 });
-
-echo '<label for="event">Event: </label>';
+echo '<div class="form-element">';
+echo '<div class="form-subelement">';
+echo '<label for="event">Event:</label>';
+echo '</div>';
+echo '<div class="form-subelement">';
 echo '<select id="event" autofocus="autofocus">';
 echo '<option value="" selected="selected" disabled="disabled"></option>';
 foreach ($events as $event) {
 	echo '<option value="' . htmlescape($event['id']) . '">' . htmlescape($event['name']) . '</option>';
 }
 echo '</select>';
+echo '</div>';
+echo '</div>';
+
 
 $clubs = database_query('SELECT "id", "name" FROM "clubs" ORDER BY "name";');
 usort($clubs, function ($a, $b) {
 	return strnatcasecmp($a['name'], $b['name']);
 });
-
-echo '<label for="club">Club: </label>';
+echo '<div class="form-element">';
+echo '<div class="form-subelement">';
+echo '<label for="club">Club:</label>';
+echo '</div>';
+echo '<div class="form-subelement">';
 echo '<select id="club">';
 echo '<option value="" selected="selected" disabled="disabled"></option>';
 foreach ($clubs as $club) {
 	echo '<option value="' . htmlescape($club['id']) . '">' . htmlescape($club['name']) . '</option>';
 }
 echo '</select>';
+echo '</div>';
+echo '</div>';
 
-echo '<label for="team">Team: </label>';
+
+echo '<div class="form-element">';
+echo '<div class="form-subelement">';
+echo '<label for="team">Team:</label>';
+echo '</div>';
+echo '<div class="form-subelement">';
 echo '<select id="team" disabled="disabled">';
 echo '<option value="" selected="selected" disabled="disabled"></option>';
 echo '</select>';
+echo '</div>';
+echo '</div>';
 
-echo '<label for="score">Score: </label>';
+
+echo '<div class="form-element">';
+echo '<div class="form-subelement">';
+echo '<label for="score">Score:</label>';
+echo '</div>';
+echo '<div class="form-subelement">';
 echo '<input id="score" value="" type="number" min="0" step="0.01" disabled="disabled" />';
+echo '</div>';
+echo '</div>';
 
+echo '<div class="form-element">';
+echo '<div class="form-subelement"></div>';
+echo '<div class="form-subelement">';
 echo '<input id="submit" type="submit" value="Save" disabled="disabled" />';
+echo ' <span id="status"></span>';
+echo '</div>';
+echo '</div>';
 
 echo '</form>';
 

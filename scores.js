@@ -10,14 +10,29 @@ $(function () {
 		updateScore();
 	});
 
-	$("#event").change(updateTeams);
+	$("#event").change(function () {
+		$("#status").text("");
+		getTeams();
+	});
 
-	$("#club").change(updateTeams);
+	$("#club").change(function () {
+		$("#status").text("");
+		getTeams();
+	});
 
-	$("#team").change(getScore);
+	$("#team").change(function () {
+		$("#status").text("");
+		getScore();
+	});
+
+	$("#score").keydown(function () {
+		$("#status").text("");
+	}).change(function () {
+		$("#status").text("");
+	});
 });
 
-function updateTeams() {
+function getTeams() {
 	$("#team").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\"></option>").val("");
 	$("#score").prop("disabled", true).val("");
 	$("#submit").prop("disabled", true);
@@ -77,6 +92,9 @@ function updateScore() {
 				event_id: $("#event").val(),
 				score: $("#score").val(),
 				_csrf_token: $("#csrf_token").val()
+			},
+			function () {
+				$("#status").text("Saved");
 			}
 		).fail(function () {
 			alert("An error occurred.");

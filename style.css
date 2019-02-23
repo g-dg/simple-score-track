@@ -8,6 +8,58 @@ body {
 	font-family: sans-serif;
 }
 
+nav {
+	z-index: 2;
+	height: 48px;
+	background-color: white;
+	margin: 0px;
+	padding: 0px;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	box-shadow: 0px 0px 8px black;
+	overflow-x: auto;
+	white-space: nowrap;
+}
+nav > header {
+	display: block;
+	float: left;
+	line-height: 48px;
+	font-size: 200%;
+	display:none;
+}
+nav > ul {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px 8px;
+	display: block;
+	line-height: 48px;
+}
+nav > ul > li {
+	display: inline-block;
+	padding: 0px 8px;
+	color: black;
+}
+nav > ul > li > a,
+nav > ul > li > a:link,
+nav > ul > li > a:visited {
+	color: black;
+}
+main {
+	padding: 8px;
+	z-index: 0;
+	top: 48px;
+	width: 100%;
+}
+footer {
+	margin-top: 32px;
+	border-top: 1px #ccc solid;
+	left: 0px;
+	width: 100%;
+	padding: 8px;
+	color: #333;
+}
+
 .error {
 	color: red;
 }
@@ -60,6 +112,10 @@ table.scores tr:hover td.score {
 	background-color: #9f9;
 }
 
+table.scores input[type="number"] {
+	width: 8em;
+}
+
 table.ranking {
 	border-collapse: collapse;
 }
@@ -76,4 +132,48 @@ table.ranking tr.second-place {
 }
 table.ranking tr.third-place {
 	background-color: #9f9;
+}
+
+form.form {
+	display: table;
+}
+form.form .form-element {
+	display: table-row;
+}
+form.form .form-subelement {
+	display: table-cell;
+}
+form.form label {
+	text-align: right;
+	padding-right: 8px;
+}
+form.form button,
+form.form input,
+form.form select,
+form.form textarea {
+	min-height: 32px;
+}
+
+@media (max-width: 768px) {
+	form.form {
+		display: block;
+	}
+	form.form .form-element {
+		display: block;
+	}
+	form.form .form-subelement {
+		display: block;
+	}
+	form.form label {
+		text-align: left;
+		font-size: 125%;
+	}
+	form.form button,
+	form.form input,
+	form.form select,
+	form.form textarea {
+		width: 100%;
+		margin-bottom: 8px;
+		min-height: 48px;
+	}
 }
