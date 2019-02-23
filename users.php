@@ -67,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 		default:
 			$_SESSION['user_admin_error'] = 'An error occurred.';
 			http_response_code(400);
+			exit();
 	}
 	header('Location: users.php');
 	exit();
