@@ -4,7 +4,7 @@ require_once('session.php');
 
 // force logon
 if (!isset($_SESSION['user_id'])) {
-	header('Location: login.php?redirect=scores.php');
+	header('Location: login.php?redirect=import_export.php');
 	exit();
 }
 
