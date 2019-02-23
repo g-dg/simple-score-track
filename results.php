@@ -173,9 +173,9 @@ if (count($scores) > 0) {
 
 
 /******************************************************************************/
-// Team Event Rankings
+// Event Rankings
 
-echo '<br /><hr /><h1>Team Event Rankings</h1>';
+echo '<br /><hr /><h1>Event Rankings</h1>';
 
 /*
 SELECT
@@ -239,6 +239,81 @@ if (count($events) > 0) {
 } else {
 	echo 'No events.';
 }
+
+
+/******************************************************************************/
+// Per-Club Event Rankings
+
+echo '<br /><hr /><h1>Per-Club Event Rankings</h1>';
+
+/*
+SELECT
+	"clubs"."id" AS "club_id",
+	"events"."id" AS "event_id",
+	"events"."name" AS "event_name",
+	AVG(IFNULL("scores"."points", 0)) AS "points"
+FROM "teams"
+INNER JOIN "clubs" ON "clubs"."id" = "teams"."club"
+INNER JOIN "events" ON 1
+LEFT JOIN "scores" ON "scores"."team" = "teams"."id" AND "scores"."event" = "events"."id"
+WHERE "club_id" = ?
+GROUP BY
+	"club_id",
+	"event_id"
+ORDER BY
+	"clubs"."name",
+	"points" DESC,
+	"event_name"
+ */
+$clubs = database_query('SELECT "id", "name" FROM "clubs" ORDER BY "name";');
+usort($clubs, function ($a, $b) {
+	return strnatcasecmp($a['name'], $b['name']);
+});
+if (count($clubs) > 0) {
+	foreach ($clubs as $club) {
+		echo '<h2>' . htmlescape($club['name']) . '</h2>';
+		$scores = database_query('SELECT "clubs"."id" AS "club_id", "events"."id" AS "event_id", "events"."name" AS "event_name", AVG(IFNULL("scores"."points", 0)) AS "points" FROM "teams" INNER JOIN "clubs" ON "clubs"."id" = "teams"."club" INNER JOIN "events" ON 1 LEFT JOIN "scores" ON "scores"."team" = "teams"."id" AND "scores"."event" = "events"."id" WHERE "club_id" = ? GROUP BY "club_id", "event_id" ORDER BY "clubs"."name", "points" DESC, "event_name";', [(int)$club['id']]);
+		if (count($scores) > 0) {
+			echo '<table class="ranking"><thead><tr><th>Rank</th><th>Event</th><th>Score</th></tr></thead><tbody>';
+			$rank = 1;
+			$highest_score = (float)$scores[0]['points'];
+			foreach ($scores as $score) {
+				// check if next rank (i.e. not tied)
+				if (round((float)$score['points'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
+					$rank++;
+					$highest_score = $score['points'];
+				}
+				switch ($rank) {
+					case 1:
+						echo '<tr class="first-place">';
+						break;
+					case 2:
+						echo '<tr class="second-place">';
+						break;
+					case 3:
+						echo '<tr class="third-place">';
+						break;
+					default:
+						echo '<tr>';
+				}
+				echo '<td>';
+				echo $rank;
+				echo '</td><td>';
+				echo htmlescape($score['event_name']);
+				echo '</td><td>';
+				echo htmlescape(round($score['points'], 2));
+				echo '</td></tr>';
+			}
+			echo '</tbody></table>';
+		} else {
+			echo 'No results.<br />';
+		}
+	}
+} else {
+	echo 'No clubs.';
+}
+
+
 
 /******************************************************************************/
 
