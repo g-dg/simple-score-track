@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 						database_query('DELETE FROM "scores" WHERE "team" = ? AND "event" = ?;', [(int)$_GET['team_id'], (int)$_GET['event_id']]);
 					}
 				} catch (Exception $e) {
-					$_SESSION['scores_error'] = 'Could not update score.';
+					$_SESSION['scores_overview_error'] = 'Could not update score.';
 				}
 			} else {
 				http_response_code(400);
@@ -35,19 +35,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 				if ($_POST['confirm_code'] === $_SESSION['confirmation_code']) {
 					try {
 						database_query('DELETE FROM "scores";');
-						$_SESSION['scores_error'] = 'All scores deleted.';
+						$_SESSION['scores_overview_error'] = 'All scores deleted.';
 					} catch (Exception $e) {
-						$_SESSION['scores_error'] = 'An error occurred while deleting the scores.';
+						$_SESSION['scores_overview_error'] = 'An error occurred while deleting the scores.';
 					}
 				} else {
-					$_SESSION['scores_error'] = 'Confirmation code incorrect, scores not deleted';
+					$_SESSION['scores_overview_error'] = 'Confirmation code incorrect, scores not deleted';
 				}
 			} else {
 				http_response_code(400);
 			}
 			break;
 		default:
-			$_SESSION['scores_error'] = 'An error occurred.';
+			$_SESSION['scores_overview_error'] = 'An error occurred.';
 			http_response_code(400);
 	}
 	header('Location: scores_overview.php');
@@ -56,13 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 
 require_once('template.php');
 
-template_header('Add/Update Scores');
+template_header('Scores Overview');
 
-if (isset($_SESSION['scores_error'])) {
+if (isset($_SESSION['scores_overview_error'])) {
 	echo '<script>alert(';
-	echo json_encode($_SESSION['scores_error']);
+	echo json_encode($_SESSION['scores_overview_error']);
 	echo ');</script>';
-	unset($_SESSION['scores_error']);
+	unset($_SESSION['scores_overview_error']);
 }
 
 $stats = database_query('SELECT "score_entries","club_count","team_count","event_count" FROM (SELECT COUNT() AS "score_entries" FROM "scores") JOIN (SELECT COUNT() AS "club_count" FROM "clubs") JOIN (SELECT COUNT() AS "team_count" FROM "teams") JOIN (SELECT COUNT() AS "event_count" FROM "events");')[0];
@@ -75,7 +75,7 @@ if (((int)$stats['team_count'] * (int)$stats['event_count']) > 0) {
 }
 echo '</strong>';
 
-echo '<h2>Add/Update Scores</h2>';
+echo '<h2>Scores Overview</h2>';
 
 $events = database_query('SELECT "id", "name" FROM "events" ORDER BY "name";');
 usort($events, function ($a, $b) {
