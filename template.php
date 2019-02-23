@@ -15,6 +15,7 @@ function template_header($title = null, $header = true, $additional_header_html 
 	echo '<meta charset="utf-8" />';
 	echo '<meta name="viewport" content="width=device-width, initial-scale=1.0" />';
 	echo '<title>' . (!is_null($title) ? htmlescape($title) . ' - ' : '') . htmlescape(APPLICATION_NAME) . ' - ' . APPLICATION_COPYRIGHT_HTML . '</title>';
+	echo '<link rel="stylesheet" href="normalize.min.css" type="text/css" />';
 	echo '<link rel="stylesheet" href="style.css" type="text/css" />';
 	echo '<script src="jquery.js"></script>';
 	echo '<script src="script.js"></script>';
