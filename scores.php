@@ -86,7 +86,7 @@ echo '<label for="event">Event:</label>';
 echo '</div>';
 echo '<div class="form-subelement">';
 echo '<select id="event" autofocus="autofocus">';
-echo '<option value="" selected="selected" disabled="disabled"></option>';
+echo '<option value="" selected="selected" disabled="disabled">-- Select Event --</option>';
 foreach ($events as $event) {
 	echo '<option value="' . htmlescape($event['id']) . '">' . htmlescape($event['name']) . '</option>';
 }
@@ -105,7 +105,7 @@ echo '<label for="club">Club:</label>';
 echo '</div>';
 echo '<div class="form-subelement">';
 echo '<select id="club">';
-echo '<option value="" selected="selected" disabled="disabled"></option>';
+echo '<option value="" selected="selected" disabled="disabled">-- Select Club --</option>';
 foreach ($clubs as $club) {
 	echo '<option value="' . htmlescape($club['id']) . '">' . htmlescape($club['name']) . '</option>';
 }
@@ -120,7 +120,7 @@ echo '<label for="team">Team:</label>';
 echo '</div>';
 echo '<div class="form-subelement">';
 echo '<select id="team" disabled="disabled">';
-echo '<option value="" selected="selected" disabled="disabled"></option>';
+echo '<option value="" selected="selected" disabled="disabled">-- Select Team --</option>';
 echo '</select>';
 echo '</div>';
 echo '</div>';

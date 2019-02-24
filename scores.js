@@ -27,7 +27,7 @@ $(function () {
 });
 
 function getTeams() {
-	$("#team").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\"></option>").val("");
+	$("#team").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\">-- Select Team --</option>").val("");
 	$("#score").prop("disabled", true).val("");
 	$("#submit").prop("disabled", true);
 
