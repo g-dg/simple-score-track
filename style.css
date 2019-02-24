@@ -9,6 +9,7 @@ body {
 }
 
 nav {
+	position: fixed;
 	z-index: 2;
 	height: 48px;
 	background-color: white;
@@ -46,6 +47,7 @@ nav > ul > li > a:visited {
 	color: black;
 }
 main {
+	position: absolute;
 	padding: 8px;
 	z-index: 0;
 	top: 48px;
@@ -84,7 +86,7 @@ table.scores th {
 	padding: 8px;
 	position: -webkit-sticky;
 	position: sticky;
-	top: 0px;
+	top: 48px;
 }
 table.scores th:first-child,
 table.scores td:first-child {
