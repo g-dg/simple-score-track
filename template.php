@@ -38,9 +38,11 @@ function template_header($title = null, $header = true, $additional_header_html 
 		echo '</nav>';
 	}
 	echo '<noscript><strong class="error" style="font-size: 200%; text-decoration: underline;">*** WARNING: You need to have Javascript enabled to use all features of this application correctly. ***</strong></noscript>';
-	echo '<main>';
 	if ($header) {
+		echo '<main>';
 		echo '<header><h1>' . (!is_null($title) ? htmlescape($title) . ' - ' : '') . htmlescape(APPLICATION_NAME) . '</h1></header>';
+	} else {
+		echo '<main class="no-header">';
 	}
 }
 
