@@ -156,7 +156,8 @@ form.form button,
 form.form input,
 form.form select,
 form.form textarea {
-	min-height: 32px;
+	min-width: 20em;
+	margin-bottom: 4px;
 }
 
 @media (max-width: 768px) {
@@ -179,6 +180,6 @@ form.form textarea {
 	form.form textarea {
 		width: 100%;
 		margin-bottom: 8px;
-		min-height: 48px;
+		padding: 8px;
 	}
 }
