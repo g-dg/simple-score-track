@@ -1,6 +1,17 @@
 PRAGMA foreign_keys = ON;
 BEGIN TRANSACTION;
 
+DROP TABLE IF EXISTS "individual_scores";
+DROP TABLE IF EXISTS "timed_scores";
+DROP TABLE IF EXISTS "timed_event_details";
+DROP TABLE IF EXISTS "point_scores";
+DROP TABLE IF EXISTS "events";
+DROP TABLE IF EXISTS "teams";
+DROP TABLE IF EXISTS "competitions";
+DROP TABLE IF EXISTS "years";
+DROP TABLE IF EXISTS "clubs";
+DROP TABLE IF EXISTS "users";
+
 CREATE TABLE "users" (
 	"id" INTEGER PRIMARY KEY,
 	"name" TEXT NOT NULL UNIQUE,
@@ -10,13 +21,6 @@ CREATE TABLE "users" (
 CREATE TABLE "clubs" (
 	"id" INTEGER PRIMARY KEY,
 	"name" TEXT NOT NULL UNIQUE
-);
-
-CREATE TABLE "teams" (
-	"id" INTEGER PRIMARY KEY,
-	"club" INTEGER NOT NULL REFERENCES "clubs" ON UPDATE CASCADE ON DELETE CASCADE,
-	"name" TEXT NOT NULL,
-	UNIQUE("club", "name")
 );
 
 CREATE TABLE "years" (
@@ -30,6 +34,14 @@ CREATE TABLE "competitions" (
 	"year" INTEGER NOT NULL REFERENCES "years" ON UPDATE CASCADE ON DELETE CASCADE,
 	"overall_point_multiplier" REAL NOT NULL DEFAULT 1.0,
 	UNIQUE("name", "year")
+);
+
+CREATE TABLE "teams" (
+	"id" INTEGER PRIMARY KEY,
+	"club" INTEGER NOT NULL REFERENCES "clubs" ON UPDATE CASCADE ON DELETE CASCADE,
+	"competition" INTEGER NOT NULL REFERENCES "competitions" ON UPDATE CASCADE ON DELETE CASCADE,
+	"name" TEXT NOT NULL,
+	UNIQUE("club", "name")
 );
 
 CREATE TABLE "events" (
