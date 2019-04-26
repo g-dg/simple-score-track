@@ -63,13 +63,13 @@ echo '<div class="form-subelement">';
 echo '<input type="submit" value="Log In" />';
 echo '</div>';
 echo '</div>';
+echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
+echo '</form>';
 if (isset($_SESSION['login_error'])) {
 	echo '<div class="error">';
 	echo htmlescape($_SESSION['login_error']);
 	echo '</div>';
 	unset($_SESSION['login_error']);
 }
-echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
-echo '</form>';
 
 template_footer();
