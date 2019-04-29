@@ -27,8 +27,8 @@ function template_header($title = null, $header = true, $additional_header_html 
 		echo '<ul>';
 		echo '<li><a href="results.php">Results</a></li>';
 		echo '<li><a href="scores.php">Score Entry</a></li>';
-		echo '<li><a href="manage_years.php">Manage Years/Competitions/Events/Clubs/Teams/Scores</a></li>';
-		echo '<li><a href="manage_users.php">Manage Users</a></li>';
+		echo '<li><a href="manage_years.php">Management</a></li>';
+		echo '<li><a href="manage_users.php">Users</a></li>';
 		echo '<li><a href="import_export.php">Import/Export Data</a></li>';
 		echo '<li><a href="logout.php">Log Out</a></li>';
 		echo '<li>Welcome, ' . htmlescape($_SESSION['user_name']) . '</li>';
