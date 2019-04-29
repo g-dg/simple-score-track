@@ -21,7 +21,18 @@ database_query('PRAGMA synchronous=NORMAL;');
 database_query('PRAGMA foreign_keys = ON;');
 
 // check if the tables exist
-if (count(database_query('SELECT "name" FROM "sqlite_master" WHERE "type" = "table" AND ("name" = \'users\' OR "name" = \'clubs\' OR "name" = \'teams\' OR "name" = \'events\' OR "name" = \'scores\')')) < 5) {
+if (count(database_query('SELECT "name" FROM "sqlite_master" WHERE "type" = "table" AND (
+	"name" = \'users\' OR
+	"name" = \'years\' OR
+	"name" = \'clubs\' OR
+	"name" = \'competitions\' OR
+	"name" = \'teams\' OR
+	"name" = \'events\' OR
+	"name" = \'point_scores\' OR
+	"name" = \'timed_event_details\' OR
+	"name" = \'timed_scores\' OR
+	"name" = \'individual_scores\'
+)')) < 10) {
 	// create the tables
 	try {
 		$database_connection->beginTransaction();
