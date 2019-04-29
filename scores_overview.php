@@ -2,11 +2,7 @@
 
 require_once('session.php');
 
-// force logon
-if (!isset($_SESSION['user_id'])) {
-	header('Location: login.php?redirect=scores_overview.php');
-	exit();
-}
+require_once('auth.php');
 
 require_once('database.php');
 
