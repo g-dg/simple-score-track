@@ -28,7 +28,7 @@ if (isset($_POST['username'], $_POST['password'], $_POST['_csrf_token']) && $_PO
 			exit();
 		}
 	} else {
-		$_SESSION['login_error'] = 'Username doesn\'t exist';
+		$_SESSION['login_error'] = 'User doesn\'t exist';
 		header('Location: login.php');
 		exit();
 	}
