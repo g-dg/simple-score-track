@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'], $_POST['_csr
 
 require_once('template.php');
 
-template_header('Score Entry', true, '<script src="scores.js"></script>');
+template_header('Score Entry', true, '<script src="res/scores.js"></script>');
 
 if (isset($_SESSION['scores_error'])) {
 	echo '<script>alert(';
