@@ -8,52 +8,81 @@ require_once('database.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'], $_POST['_csrf_token']) && $_POST['_csrf_token'] === $_SESSION['csrf_token']) {
 	switch ($_POST['action']) {
+		case 'get_competitions':
+			if (isset($_POST['year_id'])) {
+				$competitions = [];
+				foreach (database_query('SELECT "id", "name" FROM "competitions" WHERE "year" = ?', [(int)$_POST['year_id']]) as $competition) {
+					$competitions[] = ['id' => (int)$competition['id'], 'name' => $competition['name']];
+				}
+				echo json_encode($competitions);
+			} else {
+				http_response_code(400);
+			}
+			break;
+		case 'get_clubs':
+			if (isset($_POST['year_id'])) {
+				$clubs = [];
+				foreach (database_query('SELECT "id", "name" FROM "clubs" WHERE "year" = ?', [(int)$_POST['year_id']]) as $club) {
+					$clubs[] = ['id' => (int)$club['id'], 'name' => $club['name']];
+				}
+				echo json_encode($clubs);
+			} else {
+				http_response_code(400);
+			}
+			break;
+		case 'get_events':
+			if (isset($_POST['competition_id'])) {
+				$events = [];
+				foreach (database_query('SELECT "id", "name", "type" FROM "events" WHERE "competition" = ?', [(int)$_POST['competition_id']]) as $event) {
+					$events[] = ['id' => (int)$event['id'], 'name' => $event['name'], 'type' => $event['type']];
+				}
+				echo json_encode($events);
+			} else {
+				http_response_code(400);
+			}
+			break;
 		case 'get_teams':
-			if (isset($_POST['club_id'])) {
+			if (isset($_POST['club_id'], $_POST['competition_id'])) {
 				$teams = [];
-				foreach (database_query('SELECT "id", "name" FROM "teams" WHERE "club" = ?', [(int)$_POST['club_id']]) as $team) {
+				foreach (database_query('SELECT "id", "name" FROM "teams" WHERE "club" = ? AND "competition" = ?', [(int)$_POST['club_id'], (int)$_POST['competition_id']]) as $team) {
 					$teams[] = ['id' => (int)$team['id'], 'name' => $team['name']];
 				}
 				echo json_encode($teams);
 			} else {
 				http_response_code(400);
 			}
-			exit();
 			break;
 		case 'get_score':
 			if (isset($_POST['team_id'], $_POST['event_id'])) {
-				$score = database_query('SELECT "points" FROM "scores" WHERE "team" = ? AND "event" = ?;', [(int)$_POST['team_id'], (int)$_POST['event_id']]);
+				/*$score = database_query('SELECT "points" FROM "scores" WHERE "team" = ? AND "event" = ?;', [(int)$_POST['team_id'], (int)$_POST['event_id']]);
 				if (isset($score[0])) {
 					echo round($score[0]['points'], 2);
 				} else {
 					echo '';
-				}
+				}*/
 			} else {
 				http_response_code(400);
 			}
-			exit();
 			break;
-		case 'update_score':
+		case 'set_score':
 			if (isset($_POST['team_id'], $_POST['event_id'], $_POST['score'])) {
 				// check if there is a score to insert
 				if ($_POST['score'] !== '') {
 					// input the score
-					database_query('INSERT INTO "scores" ("team", "event", "points") VALUES (?, ?, ?);', [(int)$_POST['team_id'], (int)$_POST['event_id'], (float)$_POST['score']]);
+					
 				} else {
 					// clear the score
-					database_query('DELETE FROM "scores" WHERE "team" = ? AND "event" = ?;', [(int)$_POST['team_id'], (int)$_POST['event_id']]);
+					
 				}
 			} else {
 				http_response_code(400);
 			}
-			exit();
 			break;
 		default:
 			$_SESSION['scores_error'] = 'An error occurred.';
 			http_response_code(400);
-			exit();
+			break;
 	}
-	header('Location: scores.php');
 	exit();
 }
 
@@ -72,39 +101,53 @@ echo '<form id="score_form" action="scores.php" method="post" class="form">';
 
 echo '<input id="csrf_token" name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
 
-$events = database_query('SELECT "id", "name" FROM "events" ORDER BY "name";');
-usort($events, function ($a, $b) {
+$years = database_query('SELECT "id", "name" FROM "years" ORDER BY "name";');
+usort($years, function ($a, $b) {
 	return strnatcasecmp($a['name'], $b['name']);
 });
 echo '<div class="form-element">';
 echo '<div class="form-subelement">';
-echo '<label for="event">Event:</label>';
+echo '<label for="year">Year:</label>';
 echo '</div>';
 echo '<div class="form-subelement">';
-echo '<select id="event" autofocus="autofocus">';
-echo '<option value="" selected="selected" disabled="disabled">-- Select Event --</option>';
-foreach ($events as $event) {
-	echo '<option value="' . htmlescape($event['id']) . '">' . htmlescape($event['name']) . '</option>';
+echo '<select id="year" autofocus="autofocus">';
+echo '<option value="" selected="selected" disabled="disabled">-- Select Year --</option>';
+foreach ($years as $year) {
+	echo '<option value="' . htmlescape($year['id']) . '">' . htmlescape($year['name']) . '</option>';
 }
 echo '</select>';
 echo '</div>';
 echo '</div>';
 
+echo '<div class="form-element">';
+echo '<div class="form-subelement">';
+echo '<label for="competition">Competition:</label>';
+echo '</div>';
+echo '<div class="form-subelement">';
+echo '<select id="competition" disabled="disabled">';
+echo '<option value="" selected="selected" disabled="disabled">-- Select Competition --</option>';
+echo '</select>';
+echo '</div>';
+echo '</div>';
 
-$clubs = database_query('SELECT "id", "name" FROM "clubs" ORDER BY "name";');
-usort($clubs, function ($a, $b) {
-	return strnatcasecmp($a['name'], $b['name']);
-});
+echo '<div class="form-element">';
+echo '<div class="form-subelement">';
+echo '<label for="event">Event:</label>';
+echo '</div>';
+echo '<div class="form-subelement">';
+echo '<select id="event" disabled="disabled">';
+echo '<option value="" selected="selected" disabled="disabled">-- Select Event --</option>';
+echo '</select>';
+echo '</div>';
+echo '</div>';
+
 echo '<div class="form-element">';
 echo '<div class="form-subelement">';
 echo '<label for="club">Club:</label>';
 echo '</div>';
 echo '<div class="form-subelement">';
-echo '<select id="club">';
+echo '<select id="club" disabled="disabled">';
 echo '<option value="" selected="selected" disabled="disabled">-- Select Club --</option>';
-foreach ($clubs as $club) {
-	echo '<option value="' . htmlescape($club['id']) . '">' . htmlescape($club['name']) . '</option>';
-}
 echo '</select>';
 echo '</div>';
 echo '</div>';

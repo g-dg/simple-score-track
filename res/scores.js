@@ -1,7 +1,19 @@
 $(function () {
 	$("#score_form").submit(function(e) {
 		e.preventDefault();
-		updateScore();
+		setScore();
+	});
+
+	$("#year").change(function () {
+		$("#status").text("");
+		getCompetitions();
+		getClubs();
+	});
+
+	$("#competition").change(function () {
+		$("#status").text("");
+		getEvents();
+		getTeams();
 	});
 
 	$("#event").change(function () {
@@ -26,18 +38,100 @@ $(function () {
 	});
 });
 
+function getCompetitions() {
+	$("#competition").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\">-- Select Competition --</option>").val("");
+	$("#event").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\">-- Select Event --</option>").val("");
+	$("#team").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\">-- Select Team --</option>").val("");
+	$("#score").prop("disabled", true).val("");
+	$("#submit").prop("disabled", true);
+
+	if ($("#year").val() !== null) {
+		$.post(
+			"scores.php",
+			{
+				action: "get_competitions",
+				year_id: $("#year").val(),
+				_csrf_token: $("#csrf_token").val()
+			},
+			function (competitions) {
+				competitions.forEach(function (competition) {
+					$("#competition").append($("<option>").val(competition.id).text(competition.name));
+				});
+				$("#competition").prop("disabled", false);
+			},
+			"json"
+		).fail(function () {
+			alert("An error occurred getting the competitions.");
+		});
+	}
+}
+
+function getEvents() {
+	$("#event").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\">-- Select Event --</option>").val("");
+	$("#score").prop("disabled", true).val("");
+	$("#submit").prop("disabled", true);
+
+	if ($("#competition").val() !== null) {
+		$.post(
+			"scores.php",
+			{
+				action: "get_events",
+				competition_id: $("#competition").val(),
+				_csrf_token: $("#csrf_token").val()
+			},
+			function (events) {
+				events.forEach(function (event) {
+					$("#event").append($("<option>").val(event.id).text(event.name));
+				});
+				$("#event").prop("disabled", false);
+			},
+			"json"
+		).fail(function () {
+			alert("An error occurred getting the events.");
+		});
+	}
+}
+
+function getClubs() {
+	$("#club").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\">-- Select Club --</option>").val("");
+	$("#team").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\">-- Select Team --</option>").val("");
+	$("#score").prop("disabled", true).val("");
+	$("#submit").prop("disabled", true);
+
+	if ($("#year").val() !== null) {
+		$.post(
+			"scores.php",
+			{
+				action: "get_clubs",
+				year_id: $("#year").val(),
+				_csrf_token: $("#csrf_token").val()
+			},
+			function (clubs) {
+				clubs.forEach(function (club) {
+					$("#club").append($("<option>").val(club.id).text(club.name));
+				});
+				$("#club").prop("disabled", false);
+			},
+			"json"
+		).fail(function () {
+			alert("An error occurred getting the clubs.");
+		});
+	}
+}
+
 function getTeams() {
 	$("#team").prop("disabled", true).find("option").remove().end().append("<option value=\"\" selected=\"selected\" disabled=\"disabled\">-- Select Team --</option>").val("");
 	$("#score").prop("disabled", true).val("");
 	$("#submit").prop("disabled", true);
 
-	if ($("#club").val() !== null) {
+	if ($("#club").val() !== null && $("#competition").val() !== null) {
 		$.post(
 			"scores.php",
 			{
 				action: "get_teams",
 				club_id: $("#club").val(),
-				_csrf_token : $("#csrf_token").val()
+				competition_id: $("#competition").val(),
+				_csrf_token: $("#csrf_token").val()
 			},
 			function (teams) {
 				teams.forEach(function (team) {
@@ -46,8 +140,8 @@ function getTeams() {
 				$("#team").prop("disabled", false);
 			},
 			"json"
-		).fail(function() {
-			alert("An error occurred.");
+		).fail(function () {
+			alert("An error occurred getting the teams.");
 		});
 	}
 }
@@ -56,7 +150,7 @@ function getScore() {
 	$("#score").prop("disabled", true).val("");
 	$("#submit").prop("disabled", true);
 
-	if ($("#event").val() !== null && $("#club").val() !== null && $("#team").val() !== null) {
+	if ($("#event").val() !== null && $("#team").val() !== null) {
 		$.post(
 			"scores.php",
 			{
@@ -65,23 +159,23 @@ function getScore() {
 				event_id: $("#event").val(),
 				_csrf_token: $("#csrf_token").val()
 			},
-			function (score) {
-				$("#score").val(score).prop("disabled", false);
+			function (response) {
+				$("#score").val(response.score).prop("disabled", false);
 				$("#submit").prop("disabled", false);
 			},
 			"text"
 		).fail(function () {
-			alert("An error occurred.");
+			alert("An error occurred getting the score.");
 		});
 	}
 }
 
-function updateScore() {
-	if ($("#event").val() !== null && $("#club").val() !== null && $("#team").val() !== null) {
+function setScore() {
+	if ($("#event").val() !== null && $("#team").val() !== null) {
 		$.post(
 			"scores.php",
 			{
-				action: "update_score",
+				action: "set_score",
 				team_id: $("#team").val(),
 				event_id: $("#event").val(),
 				score: $("#score").val(),
@@ -91,7 +185,7 @@ function updateScore() {
 				$("#status").text("Saved");
 			}
 		).fail(function () {
-			alert("An error occurred.");
+			alert("An error occurred setting the score.");
 		});
 	}
 }
