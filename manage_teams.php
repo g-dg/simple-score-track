@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			http_response_code(400);
 			exit();
 	}
-	header('Location: teams.php');
+	header('Location: manage_teams.php');
 	exit();
 }
 
@@ -96,7 +96,7 @@ if (isset($_SESSION['team_manage_error'])) {
 
 echo '<h1>Create Club</h1>';
 
-echo '<form action="teams.php?action=club_create" method="post">';
+echo '<form action="manage_teams.php?action=club_create" method="post">';
 echo '<input name="name" value="" type="text" placeholder="Name" maxlength="255" required="required" />';
 echo '<input type="submit" value="Create" />';
 echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
@@ -120,7 +120,7 @@ foreach ($clubs as $club) {
 
 	echo '<table><tbody><tr>';
 	echo '<td>';
-	echo '<form action="teams.php?action=club_rename&amp;id=' . htmlescape(urlencode($club['id'])) . '" method="post">';
+	echo '<form action="manage_teams.php?action=club_rename&amp;id=' . htmlescape(urlencode($club['id'])) . '" method="post">';
 	echo '<input name="name" value="' . htmlescape($club['name']) . '" type="text" placeholder="Name" maxlength="255" required="required" />';
 	echo '<input type="submit" value="Rename" />';
 	echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
@@ -128,7 +128,7 @@ foreach ($clubs as $club) {
 	echo '</td>';
 
 	echo '<td>';
-	echo '<form action="teams.php?action=club_delete&amp;id=' . htmlescape(urlencode($club['id'])) . '" method="post">';
+	echo '<form action="manage_teams.php?action=club_delete&amp;id=' . htmlescape(urlencode($club['id'])) . '" method="post">';
 	echo '<input type="submit" value="Delete" data-name="' . htmlescape($club['name']) . '" onclick="return confirm(&quot;Really delete the club \\&quot;&quot; + $(this).data(&quot;name&quot;) + &quot;\\&quot;?&quot;);" />';
 	echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
 	echo '</form>';
@@ -136,7 +136,7 @@ foreach ($clubs as $club) {
 	echo '</tr></tbody></table>';
 
 	echo '<h3>Create Team</h3>';
-	echo '<form action="teams.php?action=team_create&amp;club_id=' . htmlescape(urlencode($club['id'])) . '" method="post">';
+	echo '<form action="manage_teams.php?action=team_create&amp;club_id=' . htmlescape(urlencode($club['id'])) . '" method="post">';
 	echo '<input name="name" value="" type="text" placeholder="Name" maxlength="255" required="required" />';
 	echo '<input type="submit" value="Create" />';
 	echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
@@ -155,7 +155,7 @@ foreach ($clubs as $club) {
 		echo '<tr>';
 
 		echo '<td>';
-		echo '<form action="teams.php?action=team_rename&amp;id=' . htmlescape(urlencode($team['id'])) . '" method="post">';
+		echo '<form action="manage_teams.php?action=team_rename&amp;id=' . htmlescape(urlencode($team['id'])) . '" method="post">';
 		echo '<input name="name" value="' . htmlescape($team['name']) . '" type="text" placeholder="Name" maxlength="255" required="required" />';
 		echo '<input type="submit" value="Rename" />';
 		echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
@@ -163,7 +163,7 @@ foreach ($clubs as $club) {
 		echo '</td>';
 
 		echo '<td>';
-		echo '<form action="teams.php?action=team_delete&amp;id=' . htmlescape(urlencode($team['id'])) . '" method="post">';
+		echo '<form action="manage_teams.php?action=team_delete&amp;id=' . htmlescape(urlencode($team['id'])) . '" method="post">';
 		echo '<input type="submit" value="Delete" data-name="' . htmlescape($club['name'] . ' - ' . $team['name']) . '" onclick="return confirm(&quot;Really delete the team \\&quot;&quot; + $(this).data(&quot;name&quot;) + &quot;\\&quot;?&quot;);" />';
 		echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
 		echo '</form>';

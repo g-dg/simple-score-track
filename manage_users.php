@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			http_response_code(400);
 			exit();
 	}
-	header('Location: users.php');
+	header('Location: manage_users.php');
 	exit();
 }
 
@@ -82,7 +82,7 @@ if (isset($_SESSION['user_admin_error'])) {
 
 echo '<h1>Create User</h1>';
 
-echo '<form action="users.php?action=user_create" method="post">';
+echo '<form action="manage_users.php?action=user_create" method="post">';
 echo '<input name="name" value="" type="text" placeholder="Username" maxlength="255" required="required" />';
 echo '<input name="password1" value="" type="password" placeholder="Password" maxlength="255" />';
 echo '<input name="password2" value="" type="password" placeholder="Confirm Password" maxlength="255" />';
@@ -102,7 +102,7 @@ foreach ($users as $user) {
 	echo '<tr>';
 
 	echo '<td>';
-	echo '<form action="users.php?action=user_rename&amp;id=' . htmlescape(urlencode($user['id'])) . '" method="post">';
+	echo '<form action="manage_users.php?action=user_rename&amp;id=' . htmlescape(urlencode($user['id'])) . '" method="post">';
 	echo '<input name="name" value="' . htmlescape($user['name']) . '" type="text" placeholder="Username" maxlength="255" required="required" />';
 	echo '<input type="submit" value="Rename" />';
 	echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
@@ -110,7 +110,7 @@ foreach ($users as $user) {
 	echo '</td>';
 
 	echo '<td>';
-	echo '<form action="users.php?action=user_change_password&amp;id=' . htmlescape(urlencode($user['id'])) . '" method="post">';
+	echo '<form action="manage_users.php?action=user_change_password&amp;id=' . htmlescape(urlencode($user['id'])) . '" method="post">';
 	echo '<input name="password1" value="" type="password" placeholder="Password" maxlength="255" />';
 	echo '<input name="password2" value="" type="password" placeholder="Confirm Password" maxlength="255" />';
 	echo '<input type="submit" value="Change Password" data-name="' . htmlescape($user['name']) . '" onclick="return confirm(&quot;Really change the password for \\&quot;&quot; + $(this).data(&quot;name&quot;) + &quot;\\&quot;?&quot;);" />';
@@ -119,7 +119,7 @@ foreach ($users as $user) {
 	echo '</td>';
 
 	echo '<td>';
-	echo '<form action="users.php?action=user_delete&amp;id=' . htmlescape(urlencode($user['id'])) . '" method="post">';
+	echo '<form action="manage_users.php?action=user_delete&amp;id=' . htmlescape(urlencode($user['id'])) . '" method="post">';
 	echo '<input type="submit" value="Delete" data-name="' . htmlescape($user['name']) . '" onclick="return confirm(&quot;Really delete the user \\&quot;&quot; + $(this).data(&quot;name&quot;) + &quot;\\&quot;?&quot;);" ';
 	if ((int)$user['id'] === $_SESSION['user_id']) {
 		echo 'disabled="disabled" title="You cannot delete your own account"';

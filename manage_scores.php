@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			http_response_code(400);
 			exit();
 	}
-	header('Location: scores_overview.php');
+	header('Location: manage_scores.php');
 	exit();
 }
 
@@ -117,7 +117,7 @@ foreach ($teams as $team) {
 			echo '<td class="empty">';
 		}
 
-		echo '<form action="scores_overview.php?action=score_update&amp;team_id=' . htmlescape(urlencode($team['id'])) . '&amp;event_id=' . htmlescape(urlencode($event['id'])) . '" method="post">';
+		echo '<form action="manage_scores.php?action=score_update&amp;team_id=' . htmlescape(urlencode($team['id'])) . '&amp;event_id=' . htmlescape(urlencode($event['id'])) . '" method="post">';
 		echo '<input name="score" value="' . htmlescape($score) . '" type="number" min="0" step="0.01" />';
 		echo '<input type="submit" value="Save" />';
 		echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
@@ -138,7 +138,7 @@ for ($i = 0; $i < 8; $i++) {
 }
 
 echo '<h2>Delete All Scores</h2>';
-echo '<form action="scores_overview.php?action=score_delete_all" method="post">';
+echo '<form action="manage_scores.php?action=score_delete_all" method="post">';
 echo 'To delete all scores, enter the following code in the textbox:';
 echo ' <code>';
 echo htmlescape($_SESSION['confirmation_code']);
