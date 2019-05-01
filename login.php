@@ -17,7 +17,7 @@ if (isset($_POST['username'], $_POST['password'], $_POST['_csrf_token']) && $_PO
 			$_SESSION['user_id'] = (int)$result[0]['id'];
 			$_SESSION['user_name'] = $result[0]['name'];
 			if (isset($_GET['redirect'])) {
-				header('Location: ' . urlencode($_GET['redirect']));
+				header('Location: ' . $_GET['redirect']);
 			} else {
 				header('Location: index.php');
 			}
