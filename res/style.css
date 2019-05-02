@@ -166,13 +166,10 @@ form.form textarea {
 }
 
 @media (max-width: 768px) {
-	form.form {
+	form.form > table tr {
 		display: block;
 	}
-	form.form .form-element {
-		display: block;
-	}
-	form.form .form-subelement {
+	form.form > table td {
 		display: block;
 	}
 	form.form label {
