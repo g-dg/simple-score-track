@@ -7,9 +7,9 @@ require_once('auth.php');
 require_once('database.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf_token']) && $_POST['_csrf_token'] === $_SESSION['csrf_token']) {
-	header('Content-Type: application/json');
 	switch ($_GET['action']) {
 		case 'get_competitions':
+			header('Content-Type: application/json');
 			if (isset($_POST['year_id'])) {
 				$competitions = [];
 				foreach (database_query('SELECT "id", "name" FROM "competitions" WHERE "year" = ?', [(int)$_POST['year_id']]) as $competition) {
@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			}
 			break;
 		case 'get_clubs':
+			header('Content-Type: application/json');
 			if (isset($_POST['year_id'])) {
 				$clubs = [];
 				foreach (database_query('SELECT "id", "name" FROM "clubs" WHERE "year" = ?', [(int)$_POST['year_id']]) as $club) {
@@ -32,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			}
 			break;
 		case 'get_events':
+			header('Content-Type: application/json');
 			if (isset($_POST['competition_id'])) {
 				$events = [];
 				foreach (database_query('SELECT "id", "name", "type" FROM "events" WHERE "competition" = ?', [(int)$_POST['competition_id']]) as $event) {
@@ -43,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			}
 			break;
 		case 'get_teams':
+			header('Content-Type: application/json');
 			if (isset($_POST['club_id'], $_POST['competition_id'])) {
 				$teams = [];
 				foreach (database_query('SELECT "id", "name" FROM "teams" WHERE "club" = ? AND "competition" = ?', [(int)$_POST['club_id'], (int)$_POST['competition_id']]) as $team) {
@@ -54,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			}
 			break;
 		case 'get_score':
+			header('Content-Type: application/json');
 			if (isset($_POST['event_id'])) {
 				$event_details = database_query('SELECT "type" FROM "events" WHERE "id" = ?', [(int)$_POST['event_id']]);
 				if (isset($event_details[0])) {
@@ -88,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 								$results = database_query('SELECT "id", "name", "points" FROM "individual_scores" WHERE "club" = ? AND "event" = ?', [(int)$_POST['club_id'], (int)$_POST['event_id']]);
 								$scores = [];
 								foreach ($results as $result) {
-									$scores[] = ['id' => $result['id'], 'name' => $result['name'], 'points' => (float)$result['points']];
+									$scores[$result['id']] = ['name' => $result['name'], 'points' => (float)$result['points']];
 								}
 								echo json_encode(['type' => 'individual', 'scores' => $scores]);
 							} else {
