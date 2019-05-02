@@ -40,31 +40,42 @@ template_header('Log In', false);
 
 echo '<h1>' . htmlescape(APPLICATION_NAME) . '</h1>';
 echo '<h2>Log In</h2>';
+
 echo '<form action="login.php' . (isset($_GET['redirect']) ? htmlescape('?redirect=' . urlencode($_GET['redirect'])) : '') . '" method="post" class="form">';
-echo '<div class="form-element">';
-echo '<div class="form-subelement">';
+
+echo '<table><tbody>';
+
+echo '<tr>';
+echo '<td>';
 echo '<label for="username">Username:</label>';
-echo '</div>';
-echo '<div class="form-subelement">';
+echo '</td>';
+echo '<td>';
 echo '<input id="username" name="username" type="text" autofocus="autofocus" maxlength="255" required="required" />';
-echo '</div>';
-echo '</div>';
-echo '<div class="form-element">';
-echo '<div class="form-subelement">';
+echo '</td>';
+echo '</tr>';
+
+echo '<tr>';
+echo '<td>';
 echo '<label for="password">Password:</label>';
-echo '</div>';
-echo '<div class="form-subelement">';
+echo '</td>';
+echo '<td>';
 echo '<input id="password" name="password" type="password" maxlength="255" />';
-echo '</div>';
-echo '</div>';
-echo '<div class="form-element">';
-echo '<div class="form-subelement"></div>';
-echo '<div class="form-subelement">';
+echo '</td>';
+echo '</tr>';
+
+echo '<tr>';
+echo '<td></td>';
+echo '<td>';
 echo '<input type="submit" value="Log In" />';
-echo '</div>';
-echo '</div>';
-echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
+echo '</td>';
+echo '</tr>';
+
+echo '<tr><td></td><td><input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" /></td></tr>';
+
+echo '</tbody></table>';
+
 echo '</form>';
+
 if (isset($_SESSION['login_error'])) {
 	echo '<div class="error">';
 	echo htmlescape($_SESSION['login_error']);
