@@ -22,28 +22,30 @@ $(function () {
 
 	$("#event").change(function () {
 		$("#status").text("");
-		score_type = $('#event').find(":selected").length > 0 ? $('#event').find(":selected").data("event_type") : null;
+		score_type = $("#event").find(":selected").length > 0 ? $("#event").find(":selected").data("event_type") : null;
 		switch (score_type) {
 			case "points":
 				$("#team").prop("disabled", $("#club").val() == null);
 				$("#score_points").show();
 				$("#score_time").hide();
 				$("#score_errors").hide();
+				$("#individual_scores").empty().hide();
 				break;
 			case "timed":
 				$("#team").prop("disabled", $("#club").val() == null);
 				$("#score_points").hide();
 				$("#score_time").show();
 				$("#score_errors").show();
+				$("#individual_scores").empty().hide();
 				break;
 			case "individual":
 				$("#team").prop("disabled", true).val("");
 				$("#score_points").hide();
 				$("#score_time").hide();
 				$("#score_errors").hide();
+				$("#individual_scores").empty().show();
 				break;
 		}
-		getTeams();
 		getScore();
 	});
 
@@ -84,6 +86,7 @@ function getCompetitions() {
 	$("#score_points_value").prop("disabled", true).val("");
 	$("#score_time_value").prop("disabled", true).val("");
 	$("#score_errors_value").prop("disabled", true).val("");
+	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
 	score_type = null;
 
@@ -112,6 +115,7 @@ function getEvents() {
 	$("#score_points_value").prop("disabled", true).val("");
 	$("#score_time_value").prop("disabled", true).val("");
 	$("#score_errors_value").prop("disabled", true).val("");
+	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
 	score_type = null;
 
@@ -141,6 +145,7 @@ function getClubs() {
 	$("#score_points_value").prop("disabled", true).val("");
 	$("#score_time_value").prop("disabled", true).val("");
 	$("#score_errors_value").prop("disabled", true).val("");
+	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
 
 	if ($("#year").val() !== null) {
@@ -168,9 +173,10 @@ function getTeams() {
 	$("#score_points_value").prop("disabled", true).val("");
 	$("#score_time_value").prop("disabled", true).val("");
 	$("#score_errors_value").prop("disabled", true).val("");
+	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
 
-	if ($("#club").val() !== null && $("#competition").val() !== null && score_type != "individual") {
+	if ($("#club").val() !== null && $("#competition").val() !== null) {
 		$.post(
 			"scores.php?action=get_teams",
 			{
@@ -197,6 +203,7 @@ function getScore() {
 	$("#score_points_value").prop("disabled", true).val("");
 	$("#score_time_value").prop("disabled", true).val("");
 	$("#score_errors_value").prop("disabled", true).val("");
+	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
 
 	switch (score_type) {
@@ -217,8 +224,7 @@ function getScore() {
 							$("#score_points_value").val("");
 						}
 						$("#submit").prop("disabled", false);
-					},
-					"text"
+					}
 				).fail(function () {
 					alert("An error occurred getting the score.");
 				});
@@ -247,8 +253,7 @@ function getScore() {
 							$("#score_errors_value").val("");
 						}
 						$("#submit").prop("disabled", false);
-					},
-					"text"
+					}
 				).fail(function () {
 					alert("An error occurred getting the score.");
 				});
@@ -264,10 +269,19 @@ function getScore() {
 						_csrf_token: $("#csrf_token").val()
 					},
 					function (response) {
-						
+						response = {scores: {"1": {name: "foo", points: 10.0}, "2": {name: "bar", points: 20.0}, "3": {name: "baz", points: 30.0}}};
+						Object.keys(response.scores).forEach(function (key) {
+							$("#individual_scores").append($("<tr>").append($("<td colspan=\"2\">").append($("<hr />"))));
+							$("#individual_scores").append($("<tr>").append($("<td>").text("Name:")).append($("<td>").append($("<input type=\"text\" />").data("score_entry_id", key).data("score_entry_field", "name").val(response.scores[key].name).keydown(function(){$("#status").text("");}).change(function(){$("#status").text("");}))));
+							$("#individual_scores").append($("<tr>").append($("<td>").text("Points:")).append($("<td>").append($("<input type=\"number\" min=\"0\" step=\"0.01\" />").data("score_entry_id", key).data("score_entry_field", "points").val(response.scores[key].points).keydown(function () { $("#status").text(""); }).change(function () { $("#status").text(""); }))));
+						});
+						$("#individual_scores").append($("<tr>").append($("<td colspan=\"2\">").append($("<hr />"))));
+						$("#individual_scores").append($("<tr>").append($("<td colspan=\"2\">").text("New entry:")));
+						$("#individual_scores").append($("<tr>").append($("<td>").text("Name:")).append($("<td>").append($("<input type=\"text\" />").data("score_entry_id", "").data("score_entry_field", "name").keydown(function () { $("#status").text(""); }).change(function () { $("#status").text(""); }))));
+						$("#individual_scores").append($("<tr>").append($("<td>").text("Points:")).append($("<td>").append($("<input type=\"number\" min=\"0\" step=\"0.01\" />").data("score_entry_id", "").data("score_entry_field", "points").keydown(function () { $("#status").text(""); }).change(function () { $("#status").text(""); }))));
+						$("#individual_scores").show();
 						$("#submit").prop("disabled", false);
-					},
-					"text"
+					}
 				).fail(function () {
 					alert("An error occurred getting the score.");
 				});
@@ -318,7 +332,28 @@ function setScore() {
 			}
 			break;
 		case "individual":
-
+			if ($("#event").val() !== null && $("#club").val() !== null) {
+				var scores = {};
+				$("#individual_scores>tr>td>input").each(function () {
+					if (scores[$(this).data("score_entry_id")] === undefined) {
+						scores[$(this).data("score_entry_id")] = {};
+					}
+					scores[$(this).data("score_entry_id")][$(this).data("score_entry_field")] = $(this).val();
+				});
+				$.post(
+					"scores.php?action=set_score",
+					{
+						club_id: $("#club").val(),
+						event_id: $("#event").val(),
+						scores: JSON.stringify(scores),
+						_csrf_token: $("#csrf_token").val()
+					},
+					function () {
+						$("#status").text("Saved");
+					},
+					"text"
+				)
+			}
 			break;
 	}
 }
