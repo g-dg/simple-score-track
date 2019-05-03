@@ -12,9 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			header('Content-Type: application/json');
 			if (isset($_POST['year_id'])) {
 				$competitions = [];
-				foreach (database_query('SELECT "id", "name" FROM "competitions" WHERE "year" = ?;', [(int)$_POST['year_id']]) as $competition) {
+				foreach (database_query('SELECT "id", "name" FROM "competitions" WHERE "year" = ? ORDER BY "name";', [(int)$_POST['year_id']]) as $competition) {
 					$competitions[] = ['id' => (int)$competition['id'], 'name' => $competition['name']];
 				}
+				usort($competitions, function ($a, $b) {
+					return strnatcasecmp($a['name'], $b['name']);
+				});
 				echo json_encode($competitions);
 			} else {
 				http_response_code(400);
@@ -24,9 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			header('Content-Type: application/json');
 			if (isset($_POST['year_id'])) {
 				$clubs = [];
-				foreach (database_query('SELECT "id", "name" FROM "clubs" WHERE "year" = ?;', [(int)$_POST['year_id']]) as $club) {
+				foreach (database_query('SELECT "id", "name" FROM "clubs" WHERE "year" = ? ORDER BY "name";', [(int)$_POST['year_id']]) as $club) {
 					$clubs[] = ['id' => (int)$club['id'], 'name' => $club['name']];
 				}
+				usort($clubs, function ($a, $b) {
+					return strnatcasecmp($a['name'], $b['name']);
+				});
 				echo json_encode($clubs);
 			} else {
 				http_response_code(400);
@@ -36,9 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			header('Content-Type: application/json');
 			if (isset($_POST['competition_id'])) {
 				$events = [];
-				foreach (database_query('SELECT "id", "name", "type" FROM "events" WHERE "competition" = ?;', [(int)$_POST['competition_id']]) as $event) {
+				foreach (database_query('SELECT "id", "name", "type" FROM "events" WHERE "competition" = ? ORDER BY "name";', [(int)$_POST['competition_id']]) as $event) {
 					$events[] = ['id' => (int)$event['id'], 'name' => $event['name'], 'type' => $event['type']];
 				}
+				usort($events, function ($a, $b) {
+					return strnatcasecmp($a['name'], $b['name']);
+				});
 				echo json_encode($events);
 			} else {
 				http_response_code(400);
@@ -48,9 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			header('Content-Type: application/json');
 			if (isset($_POST['club_id'], $_POST['competition_id'])) {
 				$teams = [];
-				foreach (database_query('SELECT "id", "name" FROM "teams" WHERE "club" = ? AND "competition" = ?;', [(int)$_POST['club_id'], (int)$_POST['competition_id']]) as $team) {
+				foreach (database_query('SELECT "id", "name" FROM "teams" WHERE "club" = ? AND "competition" = ? ORDER BY "name";', [(int)$_POST['club_id'], (int)$_POST['competition_id']]) as $team) {
 					$teams[] = ['id' => (int)$team['id'], 'name' => $team['name']];
 				}
+				usort($teams, function ($a, $b) {
+					return strnatcasecmp($a['name'], $b['name']);
+				});
 				echo json_encode($teams);
 			} else {
 				http_response_code(400);
@@ -89,11 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 							break;
 						case 'individual':
 							if (isset($_POST['club_id'])) {
-								$results = database_query('SELECT "id", "name", "points" FROM "individual_scores" WHERE "club" = ? AND "event" = ?;', [(int)$_POST['club_id'], (int)$_POST['event_id']]);
+								$results = database_query('SELECT "id", "name", "points" FROM "individual_scores" WHERE "club" = ? AND "event" = ? ORDER BY "name";', [(int)$_POST['club_id'], (int)$_POST['event_id']]);
 								$scores = [];
 								foreach ($results as $result) {
 									$scores[$result['id']] = ['name' => $result['name'], 'points' => (float)$result['points']];
 								}
+								uasort($scores, function ($a, $b) {
+									return strnatcasecmp($a['name'], $b['name']);
+								});
 								echo json_encode(['type' => 'individual', 'scores' => $scores]);
 							} else {
 								http_response_code(400);
