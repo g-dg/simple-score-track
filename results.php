@@ -6,311 +6,180 @@ require_once('auth.php');
 
 require_once('database.php');
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['year_id'])) {
+	header('Location: results.php?year_id=' . urlencode($_POST['year_id']));
+	exit();
+}
+
 require_once('template.php');
 
 template_header('Results');
 
-/******************************************************************************/
-// General Stats
-
-echo '<h1>General Statistics</h1>';
-
-/*
-SELECT
-	"score_entries",
-	"club_count",
-	"team_count",
-	"event_count"
-FROM (SELECT COUNT() AS "score_entries" FROM "scores")
-JOIN (SELECT COUNT() AS "club_count" FROM "clubs")
-JOIN (SELECT COUNT() AS "team_count" FROM "teams")
-JOIN (SELECT COUNT() AS "event_count" FROM "events");
- */
-$stats = database_query('SELECT "score_entries","club_count","team_count","event_count" FROM (SELECT COUNT() AS "score_entries" FROM "scores") JOIN (SELECT COUNT() AS "club_count" FROM "clubs") JOIN (SELECT COUNT() AS "team_count" FROM "teams") JOIN (SELECT COUNT() AS "event_count" FROM "events");')[0];
-echo '<ul>';
-echo '<li><strong>Completion: ';
-if (((int)$stats['team_count'] * (int)$stats['event_count']) > 0) {
-	echo htmlescape(number_format(round(((int)$stats['score_entries'] / ((int)$stats['team_count'] * (int)$stats['event_count'])) * 100, 2), 2) . '%');
-} else {
-	echo 'N/A';
-}
-echo '</strong></li>';
-echo '<li>Clubs: ' . htmlescape($stats['club_count']) . '</li>';
-echo '<li>Teams: ' . htmlescape($stats['team_count']) . '</li>';
-echo '<li>Events: ' . htmlescape($stats['event_count']) . '</li>';
-echo '</ul>';
-
-
-/******************************************************************************/
-// Overall Club Average Rankings
-
-echo '<br /><hr /><h1>Overall Club Average Rankings</h1>';
-
-/*
-SELECT
-	"clubs"."id" AS "club_id",
-	"clubs"."name" AS "club_name",
-	IFNULL(AVG("team_totals"."total_points"), 0.0) AS "average_overall_points"
-FROM "clubs"
-LEFT JOIN (
-	SELECT
-		"teams"."id" AS "team_id",
-		"teams"."name" AS "team_name",
-		"teams"."club" AS "club_id",
-		TOTAL("scores"."points" * "events"."overall_point_multiplier") AS "total_points"
-	FROM "teams"
-	LEFT JOIN "scores" ON "scores"."team" = "teams"."id"
-	LEFT JOIN "events" ON "events"."id" = "scores"."event"
-	GROUP BY "teams"."id"
-) AS "team_totals" ON "club_id" = "clubs"."id"
-GROUP BY "clubs"."id"
-ORDER BY
-	"average_overall_points" DESC,
-	"club_name";
- */
-$scores = database_query('SELECT "clubs"."id" AS "club_id","clubs"."name" AS "club_name",IFNULL(AVG("total_points"),0.0) AS "average_overall_points" FROM "clubs" LEFT JOIN (SELECT "teams"."id" AS "team_id","teams"."name" AS "team_name","teams"."club" AS "club_id",TOTAL("scores"."points"*"events"."overall_point_multiplier") AS "total_points" FROM "teams" LEFT JOIN "scores" ON "scores"."team"="teams"."id" LEFT JOIN "events" ON "events"."id"="scores"."event" GROUP BY "teams"."id") AS "team_totals" ON "club_id"="clubs"."id" GROUP BY "clubs"."id" ORDER BY "average_overall_points" DESC,"club_name";');
-if (count($scores) > 0) {
-	echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Score</th></tr></thead><tbody>';
-	$rank = 1;
-	$highest_score = (float)$scores[0]['average_overall_points'];
-	foreach ($scores as $score) {
-		// check if next rank (i.e. not tied)
-		if (round((float)$score['average_overall_points'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
-			$rank++;
-			$highest_score = $score['average_overall_points'];
-		}
-		switch ($rank) {
-			case 1:
-				echo '<tr class="first-place">';
-				break;
-			case 2:
-				echo '<tr class="second-place">';
-				break;
-			case 3:
-				echo '<tr class="third-place">';
-				break;
-			default:
-				echo '<tr>';
-		}
-		echo '<td>';
-		echo $rank;
-		echo '</td><td>';
-		echo htmlescape($score['club_name']);
-		echo '</td><td>';
-		echo htmlescape(number_format(round($score['average_overall_points'], 2), 2));
-		echo '</td></tr>';
-	}
-	echo '</tbody></table>';
-} else {
-	echo 'No results.';
-}
-
-
-/******************************************************************************/
-// Overall Team Rankings
-
-echo '<br /><hr /><h1>Overall Team Rankings</h1>';
-
-/*
-SELECT
-	"clubs"."id" AS "club_id",
-	"clubs"."name" AS "club_name",
-	"teams"."id" AS "team_id",
-	"teams"."name" AS "team_name",
-	TOTAL("scores"."points" * "events"."overall_point_multiplier") AS "total_points"
-FROM "teams"
-INNER JOIN "clubs" ON "clubs"."id" = "teams"."club"
-LEFT JOIN "scores" ON "scores"."team" = "teams"."id"
-LEFT JOIN "events" ON "events"."id" = "scores"."event"
-GROUP BY "teams"."id"
-ORDER BY
-	"total_points" DESC,
-	"clubs"."name",
-	"teams"."name";
- */
-$scores = database_query('SELECT "clubs"."id" AS "club_id","clubs"."name" AS "club_name","teams"."id" AS "team_id","teams"."name" AS "team_name",TOTAL("scores"."points"*"events"."overall_point_multiplier") AS "total_points" FROM "teams" INNER JOIN "clubs" ON "clubs"."id"="teams"."club" LEFT JOIN "scores" ON "scores"."team"="teams"."id" LEFT JOIN "events" ON "events"."id"="scores"."event" GROUP BY "teams"."id" ORDER BY "total_points" DESC,"clubs"."name","teams"."name";');
-if (count($scores) > 0) {
-	echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Team</th><th>Score</th></tr></thead><tbody>';
-	$rank = 1;
-	$highest_score = (float)$scores[0]['total_points'];
-	foreach ($scores as $score) {
-		// check if next rank (i.e. not tied)
-		if (round((float)$score['total_points'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
-			$rank++;
-			$highest_score = $score['total_points'];
-		}
-		switch ($rank) {
-			case 1:
-				echo '<tr class="first-place">';
-				break;
-			case 2:
-				echo '<tr class="second-place">';
-				break;
-			case 3:
-				echo '<tr class="third-place">';
-				break;
-			default:
-				echo '<tr>';
-		}
-		echo '<td>';
-		echo $rank;
-		echo '</td><td>';
-		echo htmlescape($score['club_name']);
-		echo '</td><td>';
-		echo htmlescape($score['team_name']);
-		echo '</td><td>';
-		echo htmlescape(round($score['total_points'], 2));
-		echo '</td></tr>';
-	}
-	echo '</tbody></table>';
-} else {
-	echo 'No results.<br />';
-}
-
-
-/******************************************************************************/
-// Event Rankings
-
-echo '<br /><hr /><h1>Event Rankings</h1>';
-
-/*
-SELECT
-	"scores"."points" AS "points",
-	"teams"."name" AS "team_name",
-	"clubs"."name" AS "club_name"
-FROM "scores"
-INNER JOIN "teams" ON "scores"."team" = "teams"."id"
-INNER JOIN "clubs" ON "teams"."club" = "clubs"."id"
-WHERE "scores"."event" = ?
-ORDER BY
-	"scores"."points" DESC,
-	"clubs"."name", "teams"."name";
- */
-$events = database_query('SELECT "id", "name" FROM "events" ORDER BY "name";');
-usort($events, function ($a, $b) {
+$years = database_query('SELECT "id", "name" FROM "years" ORDER BY "name";');
+usort($years, function ($a, $b) {
 	return strnatcasecmp($a['name'], $b['name']);
 });
-if (count($events) > 0) {
-	foreach ($events as $event) {
-		echo '<h2>' . htmlescape($event['name']) . '</h2>';
-		$scores = database_query('SELECT "scores"."points" AS "points", "teams"."name" AS "team_name", "clubs"."name" AS "club_name" FROM "scores" INNER JOIN "teams" ON "scores"."team" = "teams"."id" INNER JOIN "clubs" ON "teams"."club" = "clubs"."id" WHERE "scores"."event" = ? ORDER BY "scores"."points" DESC, "clubs"."name", "teams"."name";', [(int)$event['id']]);
-		if (count($scores) > 0) {
-			echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Team</th><th>Score</th></tr></thead><tbody>';
-			$rank = 1;
-			$highest_score = (float)$scores[0]['points'];
-			foreach ($scores as $score) {
-				// check if next rank (i.e. not tied)
-				if (round((float)$score['points'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
-					$rank++;
-					$highest_score = $score['points'];
-				}
-				switch ($rank) {
-					case 1:
-						echo '<tr class="first-place">';
-						break;
-					case 2:
-						echo '<tr class="second-place">';
-						break;
-					case 3:
-						echo '<tr class="third-place">';
-						break;
-					default:
-						echo '<tr>';
-				}
-				echo '<td>';
-				echo $rank;
-				echo '</td><td>';
-				echo htmlescape($score['club_name']);
-				echo '</td><td>';
-				echo htmlescape($score['team_name']);
-				echo '</td><td>';
-				echo htmlescape(round($score['points'], 2));
-				echo '</td></tr>';
-			}
-			echo '</tbody></table>';
-		} else {
-			echo 'No results.<br />';
-		}
+echo '<form action="results.php" method="post">';
+echo '<select name="year_id" required="required">';
+echo '<option value="" ' . (!isset($_GET['year_id']) ? 'selected="selected"' : '') . ' disabled="disabled">-- Select Year --</option>';
+foreach ($years as $year) {
+	echo '<option value="' . htmlescape($year['id']) . '" ' . (isset($_GET['year_id']) && $year['id'] == (int)$_GET['year_id'] ? 'selected="selected"' : '') . '>' . htmlescape($year['name']) . '</option>';
+}
+echo '</select>';
+echo '<input type="submit" value="Apply" />';
+echo '</form>';
+echo '<br />';
+
+if (!isset($_GET['year_id'])) {
+	exit();
+}
+
+function getPointsScore($event_id, $team_id)
+{
+	$score = database_query('SELECT "points" FROM "point_scores" WHERE "event" = ? AND "team" = ?;', [$event_id, $team_id]);
+	if (isset($score[0])) {
+		return round((float)$score[0]['points'], 2);
+	} else {
+		return null;
 	}
-} else {
-	echo 'No events.';
+}
+
+function getTimedScore($event_id, $team_id)
+{
+	$score = database_query('SELECT "time", "errors" FROM "timed_scores" WHERE "event" = ? AND "team" = ?;', [$event_id, $team_id]);
+	if (isset($score[0])) {
+		$score = $score[0];
+		$event_details = database_query('SELECT "min_time", "max_time", "max_points", "error_penalty_time", "error_exponent", "cap_points" FROM "timed_event_details" WHERE "event" = ?;', [$event_id])[0];
+		$penalty_time = pow((float)$score['errors'], (float)$event_details['error_exponent']) * (int)$event_details['error_penalty_time']; // calculate penalty time
+		$adj_time = (float)$score['time'] + $penalty_time; // calculate adjusted time
+		$points = ($adj_time - (int)$event_details['max_time']) * ((int)$event_details['max_points']) / ((int)$event_details['min_time'] - (int)$event_details['max_time']); // calculate points
+		$points = max($points, 0); // ensure points is never less than 0
+		if ($event_details['cap_points'] != 0) {
+			$points = min($points, (int)$event_details['max_points']); // cap points if required
+		}
+		return round($points, 2);
+	} else {
+		return null;
+	}
+}
+
+function getIndividualScore($event_id, $team_id)
+{
+	$club_id = (int)database_query('SELECT "club" FROM "teams" WHERE "id" = ?;', [$team_id])[0]['club'];
+	$scores = database_query('SELECT "points" FROM "individual_scores" WHERE "event" = ? AND "club" = ?;', [$event_id, $club_id]);
+	if (count($scores) > 0) {
+		$total = 0.0;
+		foreach ($scores as $score) {
+			$total += (float)$score['points'];
+		}
+		return round($total / count($scores), 2);
+	} else {
+		return null;
+	}
 }
 
 
-/******************************************************************************/
-// Per-Club Event Rankings
+$competitions = database_query('SELECT "id", "name" FROM "competitions" WHERE "year" = ?;', [(int)$_GET['year_id']]);
+if (count($competitions) > 0) {
+	foreach ($competitions as $competition) {
 
-echo '<br /><hr /><h1>Per-Club Event Rankings</h1>';
+		echo '<h1>' . htmlescape($competition['name']) . '</h1>';
 
-/*
-SELECT
-	"clubs"."id" AS "club_id",
-	"events"."id" AS "event_id",
-	"events"."name" AS "event_name",
-	AVG(IFNULL("scores"."points", 0)) AS "points"
-FROM "teams"
-INNER JOIN "clubs" ON "clubs"."id" = "teams"."club"
-INNER JOIN "events" ON 1
-LEFT JOIN "scores" ON "scores"."team" = "teams"."id" AND "scores"."event" = "events"."id"
-WHERE "club_id" = ?
-GROUP BY
-	"club_id",
-	"event_id"
-ORDER BY
-	"clubs"."name",
-	"points" DESC,
-	"event_name"
- */
-$clubs = database_query('SELECT "id", "name" FROM "clubs" ORDER BY "name";');
-usort($clubs, function ($a, $b) {
-	return strnatcasecmp($a['name'], $b['name']);
-});
-if (count($clubs) > 0) {
-	foreach ($clubs as $club) {
-		echo '<h2>' . htmlescape($club['name']) . '</h2>';
-		$scores = database_query('SELECT "clubs"."id" AS "club_id", "events"."id" AS "event_id", "events"."name" AS "event_name", AVG(IFNULL("scores"."points", 0)) AS "points" FROM "teams" INNER JOIN "clubs" ON "clubs"."id" = "teams"."club" INNER JOIN "events" ON 1 LEFT JOIN "scores" ON "scores"."team" = "teams"."id" AND "scores"."event" = "events"."id" WHERE "club_id" = ? GROUP BY "club_id", "event_id" ORDER BY "clubs"."name", "points" DESC, "event_name";', [(int)$club['id']]);
-		if (count($scores) > 0) {
-			echo '<table class="ranking"><thead><tr><th>Rank</th><th>Event</th><th>Score</th></tr></thead><tbody>';
-			$rank = 1;
-			$highest_score = (float)$scores[0]['points'];
-			foreach ($scores as $score) {
-				// check if next rank (i.e. not tied)
-				if (round((float)$score['points'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
-					$rank++;
-					$highest_score = $score['points'];
+		/******************************************************************************/
+		// Event Rankings
+
+		echo '<h2>Event Rankings</h2>';
+
+		$events = database_query('SELECT "id", "name", "type" FROM "events" WHERE "competition" = ? ORDER BY "name";', [(int)$competition['id']]);
+		usort($events, function ($a, $b) {
+			return strnatcasecmp($a['name'], $b['name']);
+		});
+
+		$teams = database_query('SELECT "clubs"."id" AS "club_id", "clubs"."name" AS "club_name", "teams"."id" AS "team_id", "teams"."name" AS "team_name" FROM "teams" INNER JOIN "clubs" ON "teams"."club" = "clubs"."id" WHERE "teams"."competition" = ? ORDER BY "club_name", "team_name";', [(int)$competition['id']]);
+		usort($teams, function ($a, $b) {
+			return $a['team_id'] == $b['team_id'] ? strnatcasecmp($a['team_name'], $b['team_name']) : strnatcasecmp($a['club_name'], $b['club_name']);
+		});
+
+		if (count($events) > 0) {
+			foreach ($events as $event) {
+				echo '<h3>' . htmlescape($event['name']) . '</h3>';
+
+				$scores = [];
+				foreach ($teams as $team) {
+					$score = null;
+					switch ($event['type']) {
+						case 'points':
+							$score = getPointsScore((int)$event['id'], (int)$team['team_id']);
+							break;
+						case 'timed':
+							$score = getTimedScore((int)$event['id'], (int)$team['team_id']);
+							break;
+						case 'individual':
+							$score = getIndividualScore((int)$event['id'], (int)$team['team_id']);
+							break;
+					}
+					if ($score !== null) {
+						$scores[] = ['score' => $score, 'club_id' => (int)$team['club_id'], 'club_name' => $team['club_name'], 'team_id' => (int)$team['team_id'], 'team_name' => $team['team_name']];
+					}
 				}
-				switch ($rank) {
-					case 1:
-						echo '<tr class="first-place">';
-						break;
-					case 2:
-						echo '<tr class="second-place">';
-						break;
-					case 3:
-						echo '<tr class="third-place">';
-						break;
-					default:
-						echo '<tr>';
+
+				usort($scores, function ($a, $b) {
+					if ($a['score'] < $b['score']) {
+						return 1;
+					} else if ($a['score'] > $b['score']) {
+						return -1;
+					} else {
+						return 0;
+					}
+				});
+
+				if (count($scores) > 0) {
+					echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Team</th><th>Score</th></tr></thead><tbody>';
+					$rank = 1;
+					$highest_score = (float)$scores[0]['score'];
+					foreach ($scores as $score) {
+						// check if next rank (i.e. not tied)
+						if (round((float)$score['score'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
+							$rank++;
+							$highest_score = $score['score'];
+						}
+						switch ($rank) {
+							case 1:
+								echo '<tr class="first-place">';
+								break;
+							case 2:
+								echo '<tr class="second-place">';
+								break;
+							case 3:
+								echo '<tr class="third-place">';
+								break;
+							default:
+								echo '<tr>';
+						}
+						echo '<td>';
+						echo $rank;
+						echo '</td><td>';
+						echo htmlescape($score['club_name']);
+						echo '</td><td>';
+						echo htmlescape($score['team_name']);
+						echo '</td><td>';
+						echo htmlescape(round($score['score'], 2));
+						echo '</td></tr>';
+					}
+					echo '</tbody></table>';
+				} else {
+					echo '<em>No results.</em><br />';
 				}
-				echo '<td>';
-				echo $rank;
-				echo '</td><td>';
-				echo htmlescape($score['event_name']);
-				echo '</td><td>';
-				echo htmlescape(round($score['points'], 2));
-				echo '</td></tr>';
 			}
-			echo '</tbody></table>';
 		} else {
-			echo 'No results.<br />';
+			echo '<em>No events.</em><br />';
 		}
+		echo '<br /><hr />';
+
+		/******************************************************************************/
 	}
 } else {
-	echo 'No clubs.';
+	echo '<em>No competitions</em><br />';
 }
-
-
-
-/******************************************************************************/
 
 template_footer();
