@@ -31,6 +31,7 @@ echo '</form>';
 echo '<br />';
 
 if (!isset($_GET['year_id'])) {
+	template_footer();
 	exit();
 }
 
