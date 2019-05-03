@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			header('Content-Type: application/json');
 			if (isset($_POST['year_id'])) {
 				$competitions = [];
-				foreach (database_query('SELECT "id", "name" FROM "competitions" WHERE "year" = ?', [(int)$_POST['year_id']]) as $competition) {
+				foreach (database_query('SELECT "id", "name" FROM "competitions" WHERE "year" = ?;', [(int)$_POST['year_id']]) as $competition) {
 					$competitions[] = ['id' => (int)$competition['id'], 'name' => $competition['name']];
 				}
 				echo json_encode($competitions);
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			header('Content-Type: application/json');
 			if (isset($_POST['year_id'])) {
 				$clubs = [];
-				foreach (database_query('SELECT "id", "name" FROM "clubs" WHERE "year" = ?', [(int)$_POST['year_id']]) as $club) {
+				foreach (database_query('SELECT "id", "name" FROM "clubs" WHERE "year" = ?;', [(int)$_POST['year_id']]) as $club) {
 					$clubs[] = ['id' => (int)$club['id'], 'name' => $club['name']];
 				}
 				echo json_encode($clubs);
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			header('Content-Type: application/json');
 			if (isset($_POST['competition_id'])) {
 				$events = [];
-				foreach (database_query('SELECT "id", "name", "type" FROM "events" WHERE "competition" = ?', [(int)$_POST['competition_id']]) as $event) {
+				foreach (database_query('SELECT "id", "name", "type" FROM "events" WHERE "competition" = ?;', [(int)$_POST['competition_id']]) as $event) {
 					$events[] = ['id' => (int)$event['id'], 'name' => $event['name'], 'type' => $event['type']];
 				}
 				echo json_encode($events);
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			header('Content-Type: application/json');
 			if (isset($_POST['club_id'], $_POST['competition_id'])) {
 				$teams = [];
-				foreach (database_query('SELECT "id", "name" FROM "teams" WHERE "club" = ? AND "competition" = ?', [(int)$_POST['club_id'], (int)$_POST['competition_id']]) as $team) {
+				foreach (database_query('SELECT "id", "name" FROM "teams" WHERE "club" = ? AND "competition" = ?;', [(int)$_POST['club_id'], (int)$_POST['competition_id']]) as $team) {
 					$teams[] = ['id' => (int)$team['id'], 'name' => $team['name']];
 				}
 				echo json_encode($teams);
@@ -59,15 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 		case 'get_score':
 			header('Content-Type: application/json');
 			if (isset($_POST['event_id'])) {
-				$event_details = database_query('SELECT "type" FROM "events" WHERE "id" = ?', [(int)$_POST['event_id']]);
+				$event_details = database_query('SELECT "type" FROM "events" WHERE "id" = ?;', [(int)$_POST['event_id']]);
 				if (isset($event_details[0])) {
 					$event_type = $event_details[0]['type'];
 					switch ($event_type) {
 						case 'points':
 							if (isset($_POST['team_id'])) {
-								$score = database_query('SELECT "points" FROM "point_scores" WHERE "team" = ? AND "event" = ?', [(int)$_POST['team_id'], (int)$_POST['event_id']]);
+								$score = database_query('SELECT "points" FROM "point_scores" WHERE "team" = ? AND "event" = ?;', [(int)$_POST['team_id'], (int)$_POST['event_id']]);
 								if (isset($score[0])) {
-									echo json_encode(['type' => 'points', 'points' => (float)$score['points']]);
+									echo json_encode(['type' => 'points', 'points' => (float)$score[0]['points']]);
 								} else {
 									echo json_encode(['type' => 'points', 'points' => null]);
 								}
@@ -77,11 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 							break;
 						case 'timed':
 							if (isset($_POST['team_id'])) {
-								$score = database_query('SELECT "time", "errors" FROM "timed_scores" WHERE "team" = ? AND "event" = ?', [(int)$_POST['team_id'], (int)$_POST['event_id']]);
+								$score = database_query('SELECT "time", "errors" FROM "timed_scores" WHERE "team" = ? AND "event" = ?;', [(int)$_POST['team_id'], (int)$_POST['event_id']]);
 								if (isset($score[0])) {
-									echo json_encode(['type' => 'timed', 'time' => (float)$score['time'], 'errors' => (float)$score['errors']]);
+									echo json_encode(['type' => 'timed', 'time' => (float)$score[0]['time'], 'errors' => (float)$score[0]['errors']]);
 								} else {
-									echo json_encode(['type' => 'timed', 'time' => null, 'errors' => 0.0]);
+									echo json_encode(['type' => 'timed', 'time' => null, 'errors' => null]);
 								}
 							} else {
 								http_response_code(400);
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 							break;
 						case 'individual':
 							if (isset($_POST['club_id'])) {
-								$results = database_query('SELECT "id", "name", "points" FROM "individual_scores" WHERE "club" = ? AND "event" = ?', [(int)$_POST['club_id'], (int)$_POST['event_id']]);
+								$results = database_query('SELECT "id", "name", "points" FROM "individual_scores" WHERE "club" = ? AND "event" = ?;', [(int)$_POST['club_id'], (int)$_POST['event_id']]);
 								$scores = [];
 								foreach ($results as $result) {
 									$scores[$result['id']] = ['name' => $result['name'], 'points' => (float)$result['points']];
@@ -112,18 +112,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 			break;
 		case 'set_score':
 			if (isset($_POST['event_id'])) {
-				$event_details = database_query('SELECT "type" FROM "events" WHERE "id" = ?', [(int)$_POST['event_id']]);
+				$event_details = database_query('SELECT "type" FROM "events" WHERE "id" = ?;', [(int)$_POST['event_id']]);
 				if (isset($event_details[0])) {
 					$event_type = $event_details[0]['type'];
 					switch ($event_type) {
 						case 'points':
-
+							if (isset($_POST['team_id'], $_POST['points'])) {
+								if ($_POST['points'] !== '') {
+									database_query('INSERT INTO "point_scores" ("team", "event", "points") VALUES (?, ?, ?);', [(int)$_POST['team_id'], (int)$_POST['event_id'], (float)$_POST['points']]);
+								} else {
+									database_query('DELETE FROM "point_scores" WHERE "team" = ? AND "event" = ?;', [(int)$_POST['team_id'], (int)$_POST['event_id']]);
+								}
+							} else {
+								http_response_code(400);
+							}
 							break;
 						case 'timed':
-
+							if (isset($_POST['team_id'], $_POST['time'], $_POST['errors'])) {
+								if ($_POST['time'] !== '' || $_POST['errors'] !== '') {
+									database_query('INSERT INTO "timed_scores" ("team", "event", "time", "errors") VALUES (?, ?, ?, ?);', [(int)$_POST['team_id'], (int)$_POST['event_id'], (float)$_POST['time'], (float)$_POST['errors']]);
+								} else {
+									database_query('DELETE FROM "timed_scores" WHERE "team" = ? AND "event" = ?;', [(int)$_POST['team_id'], (int)$_POST['event_id']]);
+								}
+							} else {
+								http_response_code(400);
+							}
 							break;
 						case 'individual':
-
+							if (isset($_POST['club_id'], $_POST['scores'])) {
+								$scores = json_decode($_POST['scores'], true);
+								foreach ($scores as $key => $score) {
+									if ($key === '' && $score['name'] !== '' && $score['points'] !== '') {
+										database_query('INSERT INTO "individual_scores" ("club", "event", "name", "points") VALUES (?, ?, ?, ?);', [(int)$_POST['club_id'], (int)$_POST['event_id'], $score['name'], (float)$score['points']]);
+									} else {
+										if ($score['name'] !== '' || $score['points'] !== '') {
+											database_query('UPDATE "individual_scores" SET "name" = ?, "points" = ? WHERE "id" = ?;', [$score['name'], (float)$score['points'], (int)$key]);
+										} else {
+											database_query('DELETE FROM "individual_scores" WHERE "id" = ?;', [(int)$key]);
+										}
+									}
+								}
+							} else {
+								http_response_code(400);
+							}
 							break;
 						default:
 							http_response_code(500);
@@ -232,7 +263,7 @@ echo '<td>';
 echo '<label for="score_time_value">Time:</label>';
 echo '</td>';
 echo '<td>';
-echo '<input id="score_time_value" value="" type="text" maxlength="250" disabled="disabled" />';
+echo '<input id="score_time_value" value="" type="text" pattern="(\d*:)?\d+(\.\d{0,3})?" placeholder="mm:ss.sss" maxlength="250" disabled="disabled" />';
 echo '</td>';
 echo '</tr>';
 
@@ -255,7 +286,6 @@ echo '<tr>';
 echo '<td></td>';
 echo '<td>';
 echo '<input id="submit" type="submit" value="Save" disabled="disabled" />';
-echo '&nbsp;<span id="status"></span>';
 echo '</td>';
 echo '</tr>';
 
