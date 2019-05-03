@@ -39,7 +39,7 @@ function getPointsScore($event_id, $team_id)
 {
 	$score = database_query('SELECT "points" FROM "point_scores" WHERE "event" = ? AND "team" = ?;', [$event_id, $team_id]);
 	if (isset($score[0])) {
-		return round((float)$score[0]['points'], 2);
+		return (float)$score[0]['points'];
 	} else {
 		return null;
 	}
@@ -58,7 +58,7 @@ function getTimedScore($event_id, $team_id)
 		if ($event_details['cap_points'] != 0) {
 			$points = min($points, (int)$event_details['max_points']); // cap points if required
 		}
-		return round($points, 2);
+		return $points;
 	} else {
 		return null;
 	}
@@ -72,7 +72,7 @@ function getIndividualScore($event_id, $club_id)
 		foreach ($scores as $score) {
 			$total += (float)$score['points'];
 		}
-		return round($total / count($scores), 2);
+		return $total / count($scores);
 	} else {
 		return null;
 	}
