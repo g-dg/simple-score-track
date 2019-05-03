@@ -184,7 +184,7 @@ if (count($scores) > 0) {
 		echo '</td><td>';
 		echo htmlescape($score['club_name']);
 		echo '</td><td>';
-		echo htmlescape(round($score['score'], 2));
+		echo htmlescape(number_format(round($score['score'], 2), 2));
 		echo '</td></tr>';
 	}
 	echo '</tbody></table>';
@@ -286,7 +286,7 @@ if (count($competitions) > 0) {
 				echo '</td><td>';
 				echo htmlescape($score['club_name']);
 				echo '</td><td>';
-				echo htmlescape(round($score['score'], 2));
+				echo htmlescape(number_format(round($score['score'], 2), 2));
 				echo '</td></tr>';
 			}
 			echo '</tbody></table>';
