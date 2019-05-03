@@ -78,7 +78,7 @@ function getIndividualScore($event_id, $club_id)
 	}
 }
 
-function getOverallScoreForTeam($competition_id, $team_id)
+function getOverallCompetitionScoreForTeam($competition_id, $team_id)
 {
 	$events = database_query('SELECT "id", "name", "type", "overall_point_multiplier" FROM "events" WHERE "competition" = ?;', [$competition_id]);
 	$team = database_query('SELECT "name", "club" FROM "teams" WHERE "id" = ?;', [$team_id])[0];
@@ -103,19 +103,98 @@ function getOverallScoreForTeam($competition_id, $team_id)
 	}
 }
 
-function getOverallAverageForClub($competition_id, $club_id)
+function getOverallCompetitionAverageForClub($competition_id, $club_id)
 {
 	$teams = database_query('SELECT "id", "name" FROM "teams" WHERE "club" = ? AND "competition" = ?;', [$club_id, $competition_id]);
 	$total = 0.0;
-	foreach ($teams as $team) {
-		$score = getOverallScoreForTeam($competition_id, (int)$team['id']);
-		if ($score !== null) {
-			$total += $score;
+	if (count($teams) > 0) {
+		foreach ($teams as $team) {
+			$score = getOverallCompetitionScoreForTeam($competition_id, (int)$team['id']);
+			if ($score !== null) {
+				$total += $score;
+			}
 		}
+		return $total / count($teams);
+	} else {
+		return null;
 	}
-	return $total / count($teams);
 }
 
+function getOverallYearScoreForClub($club_id)
+{
+	$competitions = database_query('SELECT "id", "name", "overall_point_multiplier" FROM "competitions" WHERE "year" = ?;', [(int)$_GET['year_id']]);
+	$score = 0.0;
+	foreach ($competitions as $competition) {
+		$score += getOverallCompetitionAverageForClub((int)$competition['id'], $club_id) * (float)$competition['overall_point_multiplier'];
+	}
+	return $score;
+}
+
+/******************************************************************************/
+// Overall per-year results
+
+$clubs = database_query('SELECT "id", "name" FROM "clubs" WHERE "year" = ? ORDER BY "name";', [(int)$_GET['year_id']]);
+usort($clubs, function ($a, $b) {
+	return strnatcasecmp($a['name'], $b['name']);
+});
+
+$scores = [];
+foreach ($clubs as $club) {
+	$score = getOverallYearScoreForClub((int)$club['id']);
+	if ($score !== null) {
+		$scores[] = ['score' => $score, 'club_id' => (int)$club['id'], 'club_name' => $club['name']];
+	}
+}
+
+usort($scores, function ($a, $b) {
+	if ($a['score'] < $b['score']) {
+		return 1;
+	} else if ($a['score'] > $b['score']) {
+		return -1;
+	} else {
+		return 0;
+	}
+});
+
+if (count($scores) > 0) {
+	echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Score</th></tr></thead><tbody>';
+	$rank = 1;
+	$highest_score = (float)$scores[0]['score'];
+	foreach ($scores as $score) {
+		// check if next rank (i.e. not tied)
+		if (round((float)$score['score'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
+			$rank++;
+			$highest_score = $score['score'];
+		}
+		switch ($rank) {
+			case 1:
+				echo '<tr class="first-place">';
+				break;
+			case 2:
+				echo '<tr class="second-place">';
+				break;
+			case 3:
+				echo '<tr class="third-place">';
+				break;
+			default:
+				echo '<tr>';
+		}
+		echo '<td>';
+		echo $rank;
+		echo '</td><td>';
+		echo htmlescape($score['club_name']);
+		echo '</td><td>';
+		echo htmlescape(round($score['score'], 2));
+		echo '</td></tr>';
+	}
+	echo '</tbody></table>';
+} else {
+	echo '<em>No results.</em><br />';
+}
+
+
+/******************************************************************************/
+// Competition
 
 $competitions = database_query('SELECT "id", "name", "year" FROM "competitions" WHERE "year" = ?;', [(int)$_GET['year_id']]);
 if (count($competitions) > 0) {
@@ -163,7 +242,7 @@ if (count($competitions) > 0) {
 
 		$scores = [];
 		foreach ($clubs as $club) {
-			$score = getOverallAverageForClub((int)$competition['id'], (int)$club['id']);
+			$score = getOverallCompetitionAverageForClub((int)$competition['id'], (int)$club['id']);
 			if ($score !== null) {
 				$scores[] = ['score' => $score, 'club_id' => (int)$club['id'], 'club_name' => $club['name']];
 			}
@@ -228,7 +307,7 @@ if (count($competitions) > 0) {
 
 		$scores = [];
 		foreach ($teams as $team) {
-			$score = getOverallScoreForTeam((int)$competition['id'], (int)$team['team_id']);
+			$score = getOverallCompetitionScoreForTeam((int)$competition['id'], (int)$team['team_id']);
 			if ($score !== null) {
 				$scores[] = ['score' => $score, 'club_id' => (int)$team['club_id'], 'club_name' => $team['club_name'], 'team_id' => (int)$team['team_id'], 'team_name' => $team['team_name']];
 			}
