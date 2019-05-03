@@ -156,6 +156,8 @@ usort($scores, function ($a, $b) {
 	}
 });
 
+echo '<h1>Overall Scores</h1>';
+
 if (count($scores) > 0) {
 	echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Score</th></tr></thead><tbody>';
 	$rank = 1;
@@ -200,7 +202,7 @@ $competitions = database_query('SELECT "id", "name", "year" FROM "competitions" 
 if (count($competitions) > 0) {
 	foreach ($competitions as $competition) {
 
-		echo '<h1>' . htmlescape($competition['name']) . '</h1>';
+		echo '<br /><hr /><h1>' . htmlescape($competition['name']) . '</h1>';
 
 		/******************************************************************************/
 		// General Statistics
@@ -451,7 +453,7 @@ if (count($competitions) > 0) {
 		} else {
 			echo '<em>No events.</em><br />';
 		}
-		echo '<br /><hr />';
+		echo '<br />';
 
 		/******************************************************************************/
 
