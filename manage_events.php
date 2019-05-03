@@ -53,13 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 					database_query('UPDATE "events" SET "type" = ? WHERE "id" = ?;', [$_POST['type'], (int)$_GET['id']]);
 					switch ($_POST['type']) {
 						case 'points':
-							database_query('DELETE FROM "timed_event_details" WHERE "event" = ?;', [(int)$_GET['id']]);
+
 							break;
 						case 'timed':
 							database_query('INSERT INTO "timed_event_details" ("event", "min_time", "max_time", "max_points", "error_penalty_time", "error_exponent", "cap_points") VALUES (?, 0, 600, 100, 30, 2, 1);', [$event_id]);
 							break;
 						case 'individual':
-							database_query('DELETE FROM "timed_event_details" WHERE "event" = ?;', [(int)$_GET['id']]);
+
 							break;
 					}
 				} catch (Exception $e) {

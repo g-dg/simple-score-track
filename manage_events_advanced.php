@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 				$old_event_type = database_query('SELECT "type" FROM "events" WHERE "id" = ?;', [(int)$_GET['event_id']])[0]['type'];
 				switch ($_POST['type']) {
 					case 'points':
-						database_query('DELETE FROM "timed_event_details" WHERE "event" = ?;', [(int)$_GET['event_id']]);
 						database_query('UPDATE "events" SET "type" = ?, "overall_point_multiplier" = ? WHERE "id" = ?;', [$_POST['type'], (float)$_POST['overall_point_multiplier'], (int)$_GET['event_id']]);
 						break;
 					case 'timed':
@@ -35,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 						}
 						break;
 					case 'individual':
-						database_query('DELETE FROM "timed_event_details" WHERE "event" = ?;', [(int)$_GET['event_id']]);
 						database_query('UPDATE "events" SET "type" = ?, "overall_point_multiplier" = ? WHERE "id" = ?;', [$_POST['type'], (float)$_POST['overall_point_multiplier'], (int)$_GET['event_id']]);
 						break;
 					default:
