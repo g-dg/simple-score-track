@@ -102,6 +102,19 @@ function getOverallScoreForTeam($competition_id, $team_id)
 	}
 }
 
+function getOverallAverageForClub($competition_id, $club_id)
+{
+	$teams = database_query('SELECT "id", "name" FROM "teams" WHERE "club" = ? AND "competition" = ?;', [$club_id, $competition_id]);
+	$total = 0.0;
+	foreach ($teams as $team) {
+		$score = getOverallScoreForTeam($competition_id, (int)$team['id']);
+		if ($score !== null) {
+			$total += $score;
+		}
+	}
+	return $total / count($teams);
+}
+
 
 $competitions = database_query('SELECT "id", "name", "year" FROM "competitions" WHERE "year" = ?;', [(int)$_GET['year_id']]);
 if (count($competitions) > 0) {
@@ -138,8 +151,73 @@ if (count($competitions) > 0) {
 
 
 		/******************************************************************************/
+		// Overall Club Averages
+
+		echo '<h2>Overall Club Averages</h2>';
+
+		$clubs = database_query('SELECT DISTINCT "clubs"."id" AS "id", "clubs"."name" AS "name" FROM "teams" INNER JOIN "clubs" ON "teams"."club" = "clubs"."id" WHERE "teams"."competition" = ? ORDER BY "name";', [(int)$competition['id']]);
+		usort($clubs, function ($a, $b) {
+			return strnatcasecmp($a['name'], $b['name']);
+		});
+
+		$scores = [];
+		foreach ($clubs as $club) {
+			$score = getOverallAverageForClub((int)$competition['id'], (int)$club['id']);
+			if ($score !== null) {
+				$scores[] = ['score' => $score, 'club_id' => (int)$club['id'], 'club_name' => $club['name']];
+			}
+		}
+
+		usort($scores, function ($a, $b) {
+			if ($a['score'] < $b['score']) {
+				return 1;
+			} else if ($a['score'] > $b['score']) {
+				return -1;
+			} else {
+				return 0;
+			}
+		});
+
+		if (count($scores) > 0) {
+			echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Score</th></tr></thead><tbody>';
+			$rank = 1;
+			$highest_score = (float)$scores[0]['score'];
+			foreach ($scores as $score) {
+				// check if next rank (i.e. not tied)
+				if (round((float)$score['score'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
+					$rank++;
+					$highest_score = $score['score'];
+				}
+				switch ($rank) {
+					case 1:
+						echo '<tr class="first-place">';
+						break;
+					case 2:
+						echo '<tr class="second-place">';
+						break;
+					case 3:
+						echo '<tr class="third-place">';
+						break;
+					default:
+						echo '<tr>';
+				}
+				echo '<td>';
+				echo $rank;
+				echo '</td><td>';
+				echo htmlescape($score['club_name']);
+				echo '</td><td>';
+				echo htmlescape(round($score['score'], 2));
+				echo '</td></tr>';
+			}
+			echo '</tbody></table>';
+		} else {
+			echo '<em>No results.</em><br />';
+		}
+
+
+		/******************************************************************************/
 		// Overall Team Rankings
-		
+
 		echo '<h2>Overall Team Rankings</h2>';
 
 		$teams = database_query('SELECT "clubs"."id" AS "club_id", "clubs"."name" AS "club_name", "teams"."id" AS "team_id", "teams"."name" AS "team_name" FROM "teams" INNER JOIN "clubs" ON "teams"."club" = "clubs"."id" WHERE "teams"."competition" = ? ORDER BY "club_name", "team_name";', [(int)$competition['id']]);
@@ -170,7 +248,7 @@ if (count($competitions) > 0) {
 			$rank = 1;
 			$highest_score = (float)$scores[0]['score'];
 			foreach ($scores as $score) {
-						// check if next rank (i.e. not tied)
+				// check if next rank (i.e. not tied)
 				if (round((float)$score['score'], RANKING_PRECISION) < round($highest_score, RANKING_PRECISION)) {
 					$rank++;
 					$highest_score = $score['score'];
@@ -296,7 +374,7 @@ if (count($competitions) > 0) {
 		echo '<br /><hr />';
 
 		/******************************************************************************/
-		
+
 	}
 } else {
 	echo '<em>No competitions</em><br />';
