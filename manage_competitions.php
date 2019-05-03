@@ -68,10 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 
 require_once('template.php');
 
-$year_name = database_query('SELECT "name" FROM "years" WHERE "id" = ?;', [(int)$_GET['year_id']])[0]['name'];
-template_header($year_name . ' - Manage Competitions');
+template_header('Manage Competitions');
 
-echo '<a href="manage_years.php">&lt; Back to years</a>';
+$year_details = database_query('SELECT "name" FROM "years" WHERE "id" = ?;', [(int)$_GET['year_id']])[0];
+echo '<div>';
+echo '<a href="manage_years.php">Years</a>';
+echo ' &gt; ';
+echo htmlescape($year_details['name']);
+echo '</div>';
 
 if (isset($_SESSION['competition_manage_error'])) {
 	echo '<script>alert(';
