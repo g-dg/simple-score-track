@@ -29,7 +29,7 @@ function template_header($title = null, $header = true, $additional_header_html 
 		echo '<li><a href="scores.php">Score Entry</a></li>';
 		echo '<li><a href="manage_years.php">Management</a></li>';
 		echo '<li><a href="manage_users.php">Users</a></li>';
-		echo '<li><a href="import_export.php">Import/Export Data</a></li>';
+		echo '<li><a href="import_export.php">Import/Export</a></li>';
 		echo '<li><a href="logout.php">Log Out</a></li>';
 		echo '<li>Welcome, ' . htmlescape($_SESSION['user_name']) . '</li>';
 		echo '</ul>';
