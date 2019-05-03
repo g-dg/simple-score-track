@@ -90,7 +90,7 @@ echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) .
 echo '</form>';
 
 echo '<h2>Manage Competitions</h2>';
-echo '<table><thead><tr><th>Manage</th><th>Name</th><th>Overall Point Multiplier</th><th></th></tr></thead><tbody>';
+echo '<table><thead><tr><th colspan="2">Manage</th><th>Name</th><th>Overall Point Multiplier</th><th></th></tr></thead><tbody>';
 
 $competitions = database_query('SELECT "id", "name", "overall_point_multiplier" FROM "competitions" WHERE "year" = ? ORDER BY "name";', [(int)$_GET['year_id']]);
 usort($competitions, function ($a, $b) {
@@ -102,6 +102,9 @@ foreach ($competitions as $competition) {
 
 	echo '<td>';
 	echo '<a href="manage_events.php?competition_id=' . htmlescape(urlencode($competition['id'])) . '">Events</a>';
+	echo '</td>';
+	echo '<td>';
+	echo '<a href="scores_overview.php?competition_id=' . htmlescape(urlencode($competition['id'])) . '">Scores</a>';
 	echo '</td>';
 
 	echo '<td>';
