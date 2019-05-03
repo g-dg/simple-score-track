@@ -50,7 +50,7 @@ echo '<td>';
 echo '<label for="username">Username:</label>';
 echo '</td>';
 echo '<td>';
-echo '<input id="username" name="username" type="text" autofocus="autofocus" maxlength="255" required="required" />';
+echo '<input id="username" name="username" type="text" autofocus="autofocus" maxlength="250" required="required" />';
 echo '</td>';
 echo '</tr>';
 
@@ -59,7 +59,7 @@ echo '<td>';
 echo '<label for="password">Password:</label>';
 echo '</td>';
 echo '<td>';
-echo '<input id="password" name="password" type="password" maxlength="255" />';
+echo '<input id="password" name="password" type="password" maxlength="250" />';
 echo '</td>';
 echo '</tr>';
 

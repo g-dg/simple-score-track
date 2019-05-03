@@ -75,7 +75,7 @@ if (isset($_SESSION['event_manage_error'])) {
 echo '<h1>Create Event</h1>';
 
 echo '<form action="manage_events.php?action=event_create" method="post">';
-echo '<input name="name" value="" type="text" placeholder="Name" maxlength="255" required="required" />';
+echo '<input name="name" value="" type="text" placeholder="Name" maxlength="250" required="required" />';
 echo '<input name="overall_point_multiplier" value="" type="number" placeholder="Overall Point Multiplier" min="0.0" step="0.01" required="required" />';
 echo '<input type="submit" value="Create" />';
 echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
@@ -94,7 +94,7 @@ foreach ($events as $event) {
 
 	echo '<td>';
 	echo '<form action="manage_events.php?action=event_rename&amp;id=' . htmlescape(urlencode($event['id'])) . '" method="post">';
-	echo '<input name="name" value="' . htmlescape($event['name']) . '" type="text" placeholder="Name" maxlength="255" required="required" />';
+	echo '<input name="name" value="' . htmlescape($event['name']) . '" type="text" placeholder="Name" maxlength="250" required="required" />';
 	echo '<input type="submit" value="Rename" />';
 	echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
 	echo '</form>';
