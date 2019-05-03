@@ -94,7 +94,7 @@ echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) .
 echo '</form>';
 
 echo '<h2>Manage Competitions</h2>';
-echo '<table><thead><tr><th colspan="3">Manage</th><th>Name</th><th>Overall Point Multiplier</th><th></th></tr></thead><tbody>';
+echo '<table><thead><tr><th colspan="3">Manage</th><th>Name</th><th>Overall Point Multiplier</th><th></th><th>Export</th></tr></thead><tbody>';
 
 $competitions = database_query('SELECT "id", "name", "overall_point_multiplier" FROM "competitions" WHERE "year" = ? ORDER BY "name";', [(int)$_GET['year_id']]);
 usort($competitions, function ($a, $b) {
@@ -135,6 +135,10 @@ foreach ($competitions as $competition) {
 	echo '<input type="submit" value="Delete" data-name="' . htmlescape($competition['name']) . '" onclick="return confirm(&quot;Really delete the competition \\&quot;&quot; + $(this).data(&quot;name&quot;) + &quot;\\&quot;?&quot;);" />';
 	echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
 	echo '</form>';
+	echo '</td>';
+
+	echo '<td>';
+	echo '<a href="export_csv.php?competition_id=' . htmlescape(urlencode($competition['id'])) . '&name=' . htmlescape(urlencode($competition['name'])) . '">Export (CSV)</a>';
 	echo '</td>';
 
 	echo '</tr>';
