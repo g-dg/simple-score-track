@@ -70,7 +70,7 @@ echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) .
 echo '</form>';
 
 echo '<h2>Manage Years</h2>';
-echo '<table><thead><tr><th colspan="2">Manage</th><th>Name</th><th></th></tr></thead><tbody>';
+echo '<table><thead><tr><th colspan="3">Manage</th><th>Name</th><th></th></tr></thead><tbody>';
 
 $years = database_query('SELECT "id", "name" FROM "years" ORDER BY "name";');
 usort($years, function ($a, $b) {
@@ -80,6 +80,9 @@ usort($years, function ($a, $b) {
 foreach ($years as $year) {
 	echo '<tr>';
 
+	echo '<td>';
+	echo '<a href="results.php?year_id=' . htmlescape(urlencode($year['id'])) . '">Results</a>';
+	echo '</td>';
 	echo '<td>';
 	echo '<a href="manage_competitions.php?year_id=' . htmlescape(urlencode($year['id'])) . '">Competitions</a>';
 	echo '</td>';
