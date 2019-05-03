@@ -61,7 +61,7 @@ if (isset($_SESSION['year_manage_error'])) {
 	unset($_SESSION['year_manage_error']);
 }
 
-echo '<h1>Create Year</h1>';
+echo '<h2>Create Year</h2>';
 
 echo '<form action="manage_years.php?action=year_create" method="post">';
 echo '<input name="name" value="" type="text" placeholder="Name" maxlength="250" required="required" />';
@@ -69,7 +69,7 @@ echo '<input type="submit" value="Create" />';
 echo '<input name="_csrf_token" value="' . htmlescape($_SESSION['csrf_token']) . '" type="hidden" />';
 echo '</form>';
 
-echo '<h1>Manage Years</h1>';
+echo '<h2>Manage Years</h2>';
 echo '<table><thead><tr><th colspan="2">Manage</th><th>Name</th><th></th></tr></thead><tbody>';
 
 $years = database_query('SELECT "id", "name" FROM "years" ORDER BY "name";');
