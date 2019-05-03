@@ -22,7 +22,7 @@ if (!isset($_GET['nodownload'])) {
 	header('Content-Disposition: attachment; filename="' . (isset($_GET['name']) ? preg_replace('/[^0-9A-Za-z\_\-]/', '_', $_GET['name']) : 'data') . '.csv"');
 }
 
-$events = database_query('SELECT "id" AS "event_id", "name" AS "event_name" FROM "events" WHERE "competition" = ? ORDER BY "event_name";', [(int)$_GET['competition_id']]);
+$events = database_query('SELECT "id" AS "event_id", "name" AS "event_name" FROM "events" WHERE "competition" = ? AND "type" = "points" ORDER BY "event_name";', [(int)$_GET['competition_id']]);
 $teams = database_query('SELECT "teams"."club" AS "club_id", "clubs"."name" AS "club_name", "teams"."id" AS "team_id", "teams"."name" AS "team_name" FROM "teams" INNER JOIN "clubs" ON "clubs"."id" = "teams"."club" WHERE "teams"."competition" = ? ORDER BY "club_name", "team_name";', [(int)$_GET['competition_id']]);
 
 $fh = fopen('php://output', 'w');
