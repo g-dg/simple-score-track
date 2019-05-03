@@ -19,14 +19,14 @@ $years = database_query('SELECT "id", "name" FROM "years" ORDER BY "name";');
 usort($years, function ($a, $b) {
 	return strnatcasecmp($a['name'], $b['name']);
 });
-echo '<form action="results.php" method="post">';
-echo '<select name="year_id" required="required">';
+echo '<form id="year_select_form" action="results.php" method="post">';
+echo '<select name="year_id" required="required" onchange="$(&quot;#year_select_form&quot;).submit();">';
 echo '<option value="" ' . (!isset($_GET['year_id']) ? 'selected="selected"' : '') . ' disabled="disabled">-- Select Year --</option>';
 foreach ($years as $year) {
 	echo '<option value="' . htmlescape($year['id']) . '" ' . (isset($_GET['year_id']) && $year['id'] == (int)$_GET['year_id'] ? 'selected="selected"' : '') . '>' . htmlescape($year['name']) . '</option>';
 }
 echo '</select>';
-echo '<input type="submit" value="Apply" />';
+//echo '<input type="submit" value="Apply" />';
 echo '</form>';
 echo '<br />';
 
