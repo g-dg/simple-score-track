@@ -129,7 +129,7 @@ echo '</form>';
 echo '<h2>Manage Events</h2>';
 echo '<table><thead><tr><th>Name</th><th>Type</th><th></th><th></th></tr></thead><tbody>';
 
-$events = database_query('SELECT "id", "name", "type" FROM "events" ORDER BY "name";');
+$events = database_query('SELECT "id", "name", "type" FROM "events" WHERE "competition" = ? ORDER BY "name";', [(int)$_GET['competition_id']]);
 usort($events, function ($a, $b) {
 	return strnatcasecmp($a['name'], $b['name']);
 });
