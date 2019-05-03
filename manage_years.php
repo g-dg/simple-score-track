@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 				try {
 					database_query('INSERT INTO "years" ("name") VALUES (?);', [$_POST['name']]);
 				} catch (Exception $e) {
-					$_SESSION['year_manage_error'] = 'An error occurred creating the year. (Check that an year with the same name does not already exist)';
+					$_SESSION['year_manage_error'] = 'An error occurred creating the year. (Check that a year with the same name does not already exist)';
 				}
 			} else {
 				http_response_code(400);
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 				try {
 					database_query('UPDATE "years" SET "name" = ? WHERE "id" = ?;', [$_POST['name'], (int)$_GET['id']]);
 				} catch (Exception $e) {
-					$_SESSION['year_manage_error'] = 'An error occurred renaming the year. (Check that an year with the same name does not already exist)';
+					$_SESSION['year_manage_error'] = 'An error occurred renaming the year. (Check that a year with the same name does not already exist)';
 				}
 			} else {
 				http_response_code(400);
