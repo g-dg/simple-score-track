@@ -42,7 +42,7 @@ CREATE TABLE "teams" (
 	"club" INTEGER NOT NULL REFERENCES "clubs" ON UPDATE CASCADE ON DELETE CASCADE,
 	"competition" INTEGER NOT NULL REFERENCES "competitions" ON UPDATE CASCADE ON DELETE CASCADE,
 	"name" TEXT NOT NULL,
-	UNIQUE("club", "name")
+	UNIQUE("club", "name", "competition")
 );
 
 CREATE TABLE "events" (
