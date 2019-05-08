@@ -224,7 +224,7 @@ function getScore() {
 						if (response.time !== null) {
 							var time_minutes = Math.floor(response.time / 60);
 							var time_seconds = response.time - (time_minutes * 60);
-							time_seconds = time_seconds.toFixed(3);
+							time_seconds = ("00" + time_seconds.toFixed(3)).slice(-6);
 							if (time_minutes == 0) {
 								var time = time_seconds + "";
 							} else {
