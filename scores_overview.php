@@ -66,6 +66,9 @@ foreach ($events as $event) {
 
 echo '</thead><tbody>';
 
+$present_score_entries = 0;
+$missing_score_entries = 0;
+
 foreach ($teams as $team) {
 	echo '<tr>';
 
@@ -78,6 +81,7 @@ foreach ($teams as $team) {
 			case 'points':
 				$score = database_query('SELECT "points" FROM "point_scores" WHERE "team" = ? AND "event" = ?;', [(int)$team['id'], (int)$event['id']]);
 				if (isset($score[0])) {
+					$present_score_entries++;
 					$score = round($score[0]['points'], 2);
 					if ($score == 0) {
 						echo '<td class="zero">0</td>';
@@ -85,24 +89,29 @@ foreach ($teams as $team) {
 						echo '<td class="score">' . htmlescape($score) . '</td>';
 					}
 				} else {
+					$missing_score_entries++;
 					echo '<td class="empty"></td>';
 				}
 				break;
 			case 'timed':
 				$score = database_query('SELECT "time", "errors" FROM "timed_scores" WHERE "team" = ? AND "event" = ?;', [(int)$team['id'], (int)$event['id']]);
 				if (isset($score[0])) {
+					$present_score_entries++;
 					$minutes = floor((float)$score[0]['time'] / 60);
 					$seconds = (float)$score[0]['time'] - ($minutes * 60);
 					echo '<td class="score">' . htmlescape($minutes) . ':' . htmlescape(sprintf('%06.3f', round($seconds, 3))) . '; ' . htmlescape(round($score[0]['errors'], 2)) . '</td>';
 				} else {
+					$missing_score_entries++;
 					echo '<td class="empty"></td>';
 				}
 				break;
 			case 'individual':
 				$score = getIndividualScore((int)$event['id'], (int)$team['club_id']);
 				if ($score !== null) {
+					$present_score_entries++;
 					echo '<td class="score">' . htmlescape(round($score, 2)) . '</td>';
 				} else {
+					$missing_score_entries++;
 					echo '<td class="empty"></td>';
 				}
 				break;
@@ -113,5 +122,7 @@ foreach ($teams as $team) {
 }
 
 echo '</tbody></table>';
+
+echo '<p>Scores entered: ' . htmlescape($present_score_entries) . ' out of ' . htmlescape($present_score_entries + $missing_score_entries) . ' (' . htmlescape(round(($present_score_entries / ($present_score_entries + $missing_score_entries)) * 100, 2)) . '%)</p>';
 
 template_footer();
