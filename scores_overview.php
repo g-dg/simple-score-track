@@ -123,6 +123,6 @@ foreach ($teams as $team) {
 
 echo '</tbody></table>';
 
-echo '<p>Scores entered: ' . htmlescape($present_score_entries) . ' out of ' . htmlescape($present_score_entries + $missing_score_entries) . ' (' . htmlescape(round(($present_score_entries / ($present_score_entries + $missing_score_entries)) * 100, 2)) . '%)</p>';
+echo '<p>Scores entered: ' . htmlescape($present_score_entries) . ' out of ' . htmlescape($present_score_entries + $missing_score_entries) . ' (' . (($present_score_entries + $missing_score_entries) > 0 ? htmlescape(round(($present_score_entries / ($present_score_entries + $missing_score_entries)) * 100, 2)) : '0') . '%)</p>';
 
 template_footer();
