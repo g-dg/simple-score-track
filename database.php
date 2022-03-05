@@ -17,6 +17,8 @@ $database_connection->setAttribute(PDO::ATTR_TIMEOUT, 60);
 // use write-ahead logging for performance reasons
 database_query('PRAGMA journal_mode=WAL;');
 database_query('PRAGMA synchronous=NORMAL;');
+// set busy timeout
+database_query('PRAGMA busy_timeout = 60000;');
 // enable foreign key constraints
 database_query('PRAGMA foreign_keys = ON;');
 
@@ -60,25 +62,7 @@ $database_connection->commit();
 function database_query($sql, $params = [])
 {
 	global $database_connection;
-	$done_retrying = false;
-	$start_time = time();
-	while (!$done_retrying) {
-		try {
-			$stmt = $database_connection->prepare($sql);
-			$stmt->execute($params);
-			$database_affected_row_count = $stmt->rowCount();
-			$done_retrying = true;
-		} catch (PDOException $e) {
-			// keep retrying if locked
-			if (substr_count($e->getMessage(), 'database is locked') == 0) {
-				throw new Exception($e->getMessage(), 0, $e);
-			} else {
-				if (time() - $start_time > 60) {
-					throw new Exception($e->getMessage(), 0, $e);
-				}
-				usleep(mt_rand(1000, 10000));
-			}
-		}
-	}
+	$stmt = $database_connection->prepare($sql);
+	$stmt->execute($params);
 	return $stmt->fetchAll();
 }
