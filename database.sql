@@ -66,8 +66,8 @@ CREATE TABLE "timed_event_details" (
 	"min_time" INTEGER NOT NULL,
 	"max_time" INTEGER NOT NULL,
 	"max_points" INTEGER NOT NULL,
-	"error_penalty_time" INTEGER NOT NULL,
-	"error_exponent" REAL NOT NULL DEFAULT 1.0,
+	"max_errors" INTEGER NOT NULL,
+	"correctness_points" INTEGER NOT NULL,
 	"cap_points" INTEGER NOT NULL DEFAULT 1
 );
 
