@@ -50,13 +50,13 @@ function getTimedScore($event_id, $team_id)
 	$score = database_query('SELECT "time", "errors" FROM "timed_scores" WHERE "event" = ? AND "team" = ?;', [$event_id, $team_id]);
 	if (isset($score[0])) {
 		$score = $score[0];
-		$event_details = database_query('SELECT "min_time", "max_time", "max_points", "error_penalty_time", "error_exponent", "cap_points" FROM "timed_event_details" WHERE "event" = ?;', [$event_id])[0];
-		$penalty_time = pow((float)$score['errors'], (float)$event_details['error_exponent']) * (int)$event_details['error_penalty_time']; // calculate penalty time
-		$adj_time = (float)$score['time'] + $penalty_time; // calculate adjusted time
-		$points = ($adj_time - (int)$event_details['max_time']) * ((int)$event_details['max_points']) / ((int)$event_details['min_time'] - (int)$event_details['max_time']); // calculate points
+		$event_details = database_query('SELECT "min_time", "max_time", "max_points", "max_errors", "correctness_points", "cap_points" FROM "timed_event_details" WHERE "event" = ?;', [$event_id])[0];
+		$time_points = ((float)$score['time'] - (int)$event_details['max_time']) * ((int)$event_details['max_points']) / ((int)$event_details['min_time'] - (int)$event_details['max_time']);
+		$correctness_points = ((float)$score['errors'] - $event_details['max_errors']) * ($event_details['correctness_points'] - 0) / (0 - $event_details['max_errors']);
+		$points = $time_points + $correctness_points;
 		$points = max($points, 0); // ensure points is never less than 0
 		if ($event_details['cap_points'] != 0) {
-			$points = min($points, (int)$event_details['max_points']); // cap points if required
+			$points = min($points, (int)$event_details['max_points'] + (int)$event_details['correctness_points']); // cap points if required
 		}
 		return $points;
 	} else {
@@ -130,7 +130,7 @@ function getOverallYearScoreForClub($club_id)
 		if ($club_average !== null) {
 			$score += $club_average * (float)$competition['overall_point_multiplier'];
 			$competition_score_count++;
-	}
+		}
 	}
 	return $score / max($competition_score_count, 1);
 }

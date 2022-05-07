@@ -23,10 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 					case 'timed':
 						database_query('UPDATE "events" SET "type" = ?, "overall_point_multiplier" = ? WHERE "id" = ?;', [$_POST['type'], (float)$_POST['overall_point_multiplier'], (int)$_GET['event_id']]);
 						if ($old_event_type != 'timed') {
-							database_query('INSERT INTO "timed_event_details" ("event", "min_time", "max_time", "max_points", "error_penalty_time", "error_exponent", "cap_points") VALUES (?, 0, 600, 100, 30, 2, 1);', [(int)$_GET['event_id']]);
+							database_query('INSERT INTO "timed_event_details" ("event", "min_time", "max_time", "max_points", "max_errors", "correctness_points", "cap_points") VALUES (?, 0, 600, 50, 10, 50, 1);', [(int)$_GET['event_id']]);
 						} else {
-							if (isset($_POST['min_time'], $_POST['max_time'], $_POST['max_points'], $_POST['error_penalty_time'], $_POST['error_exponent'], $_POST['cap_points'])) {
-								database_query('UPDATE "timed_event_details" SET "min_time" = ?, "max_time" = ?, "max_points" = ?, "error_penalty_time" = ?, "error_exponent" = ?, "cap_points" = ? WHERE "event" = ?;', [(int)$_POST['min_time'], (int)$_POST['max_time'], (int)$_POST['max_points'], (float)$_POST['error_penalty_time'], (float)$_POST['error_exponent'], (int)$_POST['cap_points'], (int)$_GET['event_id']]);
+							if (isset($_POST['min_time'], $_POST['max_time'], $_POST['max_points'], $_POST['max_errors'], $_POST['correctness_points'], $_POST['cap_points'])) {
+								database_query('UPDATE "timed_event_details" SET "min_time" = ?, "max_time" = ?, "max_points" = ?, "max_errors" = ?, "correctness_points" = ?, "cap_points" = ? WHERE "event" = ?;', [(int)$_POST['min_time'], (int)$_POST['max_time'], (int)$_POST['max_points'], (int)$_POST['max_errors'], (int)$_POST['correctness_points'], (int)$_POST['cap_points'], (int)$_GET['event_id']]);
 							} else {
 								http_response_code(400);
 								$_SESSION['event_manage_advanced_error'] = 'Could not edit the event.';
@@ -91,7 +91,7 @@ switch ($event_details['type']) {
 		$event_advanced_details = [];
 		break;
 	case 'timed':
-		$event_advanced_details = database_query('SELECT "min_time", "max_time", "max_points", "error_penalty_time", "error_exponent", "cap_points" FROM "timed_event_details" WHERE "event" = ?;', [(int)$_GET['event_id']])[0];
+		$event_advanced_details = database_query('SELECT "min_time", "max_time", "max_points", "max_errors", "correctness_points", "cap_points" FROM "timed_event_details" WHERE "event" = ?;', [(int)$_GET['event_id']])[0];
 		break;
 	case 'individual':
 		$event_advanced_details = [];
@@ -141,23 +141,23 @@ switch ($event_details['type']) {
 		echo '</tr>';
 
 		echo '<tr>';
-		echo '<td>Maximum points</td>';
+		echo '<td>Maximum points:</td>';
 		echo '<td>';
 		echo '<input name="max_points" value="' . htmlescape($event_advanced_details['max_points']) . '" type="number" min="0" step="1" >';
 		echo '</td>';
 		echo '</tr>';
 
 		echo '<tr>';
-		echo '<td>Error penalty time (seconds):</td>';
+		echo '<td>Maximum errors:</td>';
 		echo '<td>';
-		echo '<input name="error_penalty_time" value="' . htmlescape($event_advanced_details['error_penalty_time']) . '" type="number" min="0" step="1" >';
+		echo '<input name="max_errors" value="' . htmlescape($event_advanced_details['max_errors']) . '" type="number" min="0" step="1" >';
 		echo '</td>';
 		echo '</tr>';
 
 		echo '<tr>';
-		echo '<td>Error exponent:</td>';
+		echo '<td>Correctness points:</td>';
 		echo '<td>';
-		echo '<input name="error_exponent" value="' . htmlescape(round($event_advanced_details['error_exponent'], 2)) . '" type="number" min="0" step="0.01" >';
+		echo '<input name="correctness_points" value="' . htmlescape($event_advanced_details['correctness_points']) . '" type="number" min="0" step="1" >';
 		echo '</td>';
 		echo '</tr>';
 

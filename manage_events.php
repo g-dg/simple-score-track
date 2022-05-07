@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 
 							break;
 						case 'timed':
-							database_query('INSERT INTO "timed_event_details" ("event", "min_time", "max_time", "max_points", "error_penalty_time", "error_exponent", "cap_points") VALUES (?, 0, 600, 100, 30, 2, 1);', [$event_id]);
+							database_query('INSERT INTO "timed_event_details" ("event", "min_time", "max_time", "max_points", "max_errors", "correctness_points", "cap_points") VALUES (?, 0, 600, 50, 10, 50, 1);', [$event_id]);
 							break;
 						case 'individual':
 
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_GET['action'], $_POST['_csrf
 
 							break;
 						case 'timed':
-							database_query('INSERT INTO "timed_event_details" ("event", "min_time", "max_time", "max_points", "error_penalty_time", "error_exponent", "cap_points") VALUES (?, 0, 600, 100, 30, 2, 1);', [$event_id]);
+							database_query('INSERT INTO "timed_event_details" ("event", "min_time", "max_time", "max_points", "max_errors", "correctness_points", "cap_points") VALUES (?, 0, 600, 50, 10, 50, 1);', [$event_id]);
 							break;
 						case 'individual':
 
