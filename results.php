@@ -124,10 +124,15 @@ function getOverallYearScoreForClub($club_id)
 {
 	$competitions = database_query('SELECT "id", "name", "overall_point_multiplier" FROM "competitions" WHERE "year" = ?;', [(int)$_GET['year_id']]);
 	$score = 0.0;
+	$competition_score_count = 0;
 	foreach ($competitions as $competition) {
-		$score += getOverallCompetitionAverageForClub((int)$competition['id'], $club_id) * (float)$competition['overall_point_multiplier'];
+		$club_average = getOverallCompetitionAverageForClub((int)$competition['id'], $club_id);
+		if ($club_average !== null) {
+			$score += $club_average * (float)$competition['overall_point_multiplier'];
+			$competition_score_count++;
 	}
-	return $score;
+	}
+	return $score / max($competition_score_count, 1);
 }
 
 /******************************************************************************/
