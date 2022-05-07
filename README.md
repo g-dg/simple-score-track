@@ -26,3 +26,11 @@ Installation Instructions
 3. Create the database file (ensure the server process has read-write access to both it and the directory it is in.)
 4. Open a web browser to the application's location
 5. Log in with the username and password set in the configuration file
+
+
+Upgrade Instructions
+--------------------
+
+1. Remove all files except for `config.php` and `database.sqlite3`
+2. Copy new files to the same directory
+3. Run the SQL scripts in the `database_updates` folder in ascending order that have not been run yet
