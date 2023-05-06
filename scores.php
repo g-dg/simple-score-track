@@ -304,6 +304,13 @@ echo '<input id="submit" type="submit" value="Save" disabled="disabled" />';
 echo '</td>';
 echo '</tr>';
 
+echo '<tr>';
+echo '<td></td>';
+echo '<td>';
+echo '<div id="status">Ready.</div>';
+echo '</td>';
+echo '</tr>';
+
 echo '</tfoot>';
 
 echo '</table>';
