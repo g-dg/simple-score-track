@@ -130,7 +130,7 @@ function getOverallYearScoreForClub($club_id)
 			$score += $club_average * (float)$competition['overall_point_multiplier'];
 		}
 	}
-	return $score / max(count($competitions), 1);
+	return $score;
 }
 
 /******************************************************************************/

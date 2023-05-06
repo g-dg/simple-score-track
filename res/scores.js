@@ -11,13 +11,13 @@ $(function () {
 	$("#year").change(function () {
 		getCompetitions();
 		getClubs();
-		$("status").text("Ready.");
+		$("#status").text("Ready.");
 	});
 
 	$("#competition").change(function () {
 		getEvents();
 		getTeams();
-		$("status").text("Ready.");
+		$("#status").text("Ready.");
 	});
 
 	$("#event").change(function () {
@@ -46,7 +46,7 @@ $(function () {
 				break;
 		}
 		getScore();
-		$("status").text("Ready.");
+		$("#status").text("Ready.");
 	});
 
 	$("#club").change(function () {
@@ -54,17 +54,17 @@ $(function () {
 		if (score_type == "individual") {
 			getScore();
 		}
-		$("status").text("Ready.");
+		$("#status").text("Ready.");
 	});
 
 	$("#team").change(function () {
 		getScore();
-		$("status").text("Ready.");
+		$("#status").text("Ready.");
 	});
 
 	$(document).on("ajaxError", function () {
 		alert("An error occurred.");
-		$("status").text("An error occurred.");
+		$("#status").text("An error occurred.");
 	});
 });
 
@@ -287,7 +287,7 @@ function getScore() {
 }
 
 function setScore() {
-	$("status").text("Saving...");
+	$("#status").text("Saving...");
 
 	switch (score_type) {
 		case "points":
@@ -302,7 +302,7 @@ function setScore() {
 					},
 					function () {
 						getScore();
-						$("status").text("Saved.");
+						$("#status").text("Saved.");
 					},
 					"text"
 				).fail(function () {
@@ -337,7 +337,7 @@ function setScore() {
 					},
 					function () {
 						getScore();
-						$("status").text("Saved.");
+						$("#status").text("Saved.");
 					},
 					"text"
 				).fail(function () {
@@ -364,7 +364,7 @@ function setScore() {
 					},
 					function () {
 						getScore();
-						$("status").text("Saved.");
+						$("#status").text("Saved.");
 					},
 					"text"
 				)
