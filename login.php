@@ -1,8 +1,7 @@
 <?php
 
+require_once('constants.php');
 require_once('session.php');
-
-require_once('config.php');
 
 if (isset($_POST['username'], $_POST['password'], $_POST['_csrf_token']) && $_POST['_csrf_token'] === $_SESSION['csrf_token']) {
 	require_once('database.php');

@@ -1,9 +1,8 @@
 <?php
 
+require_once('constants.php');
 require_once('session.php');
-
 require_once('auth.php');
-
 require_once('database.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['year_id'])) {
