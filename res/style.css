@@ -184,3 +184,7 @@ form.form textarea {
 		padding: 8px;
 	}
 }
+
+.minimal .minimal-hidden {
+	display: none;
+}

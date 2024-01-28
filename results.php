@@ -27,6 +27,7 @@ foreach ($years as $year) {
 echo '</select>';
 //echo '<input type="submit" value="Apply" />';
 echo '</form>';
+echo '<input id="minimal" type="checkbox" oninput="if ($(&quot;#minimal&quot;).is(&quot;:checked&quot;)) $(&quot;main&quot;).addClass(&quot;minimal&quot;); else $(&quot;main&quot;).removeClass(&quot;minimal&quot;);"><label for="minimal">Minimal</label></input>';
 echo '<br />';
 
 if (!isset($_GET['year_id'])) {
@@ -181,7 +182,11 @@ if (count($scores) > 0) {
 				echo '<tr class="third-place">';
 				break;
 			default:
-				echo '<tr>';
+				if ($rank > 5) {
+					echo '<tr class="minimal-hidden">';
+				} else {
+					echo '<tr>';
+				}
 		}
 		echo '<td>';
 		echo $rank;
@@ -283,7 +288,11 @@ if (count($competitions) > 0) {
 						echo '<tr class="third-place">';
 						break;
 					default:
-						echo '<tr>';
+						if ($rank > 5) {
+							echo '<tr class="minimal-hidden">';
+						} else {
+							echo '<tr>';
+						}
 				}
 				echo '<td>';
 				echo $rank;
@@ -348,7 +357,11 @@ if (count($competitions) > 0) {
 						echo '<tr class="third-place">';
 						break;
 					default:
-						echo '<tr>';
+						if ($rank > 10) {
+							echo '<tr class="minimal-hidden">';
+						} else {
+							echo '<tr>';
+						}
 				}
 				echo '<td>';
 				echo $rank;
@@ -435,7 +448,11 @@ if (count($competitions) > 0) {
 								echo '<tr class="third-place">';
 								break;
 							default:
-								echo '<tr>';
+								if ($rank > 3) {
+									echo '<tr class="minimal-hidden">';
+								} else {
+									echo '<tr>';
+								}
 						}
 						echo '<td>';
 						echo $rank;
