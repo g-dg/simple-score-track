@@ -11,13 +11,11 @@ $(function () {
 	$("#year").change(function () {
 		getCompetitions();
 		getClubs();
-		$("#status").text("Ready.");
 	});
 
 	$("#competition").change(function () {
 		getEvents();
 		getTeams();
-		$("#status").text("Ready.");
 	});
 
 	$("#event").change(function () {
@@ -46,7 +44,6 @@ $(function () {
 				break;
 		}
 		getScore();
-		$("#status").text("Ready.");
 	});
 
 	$("#club").change(function () {
@@ -54,17 +51,16 @@ $(function () {
 		if (score_type == "individual") {
 			getScore();
 		}
-		$("#status").text("Ready.");
 	});
 
 	$("#team").change(function () {
 		getScore();
-		$("#status").text("Ready.");
 	});
 
 	$(document).on("ajaxError", function () {
 		alert("An error occurred.");
 		$("#status").text("An error occurred.");
+		$("#status").addClass("error");
 	});
 });
 
@@ -77,6 +73,8 @@ function getCompetitions() {
 	$("#score_errors_value").prop("disabled", true).val("");
 	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
+	$("#status").text("Loading...");
+	$("#status").removeClass("error");
 	score_type = null;
 
 	if ($("#year").val() !== null) {
@@ -91,10 +89,14 @@ function getCompetitions() {
 					$("#competition").append($("<option>").val(competition.id).text(competition.name));
 				});
 				$("#competition").prop("disabled", false);
+				$("#status").text("Ready.");
+				$("#status").removeClass("error");
 			},
 			"json"
 		).fail(function () {
 			alert("An error occurred getting the competitions.");
+			$("#status").text("An error occurred getting the competitions.");
+			$("#status").addClass("error");
 		});
 	}
 }
@@ -106,6 +108,8 @@ function getEvents() {
 	$("#score_errors_value").prop("disabled", true).val("");
 	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
+	$("#status").text("Loading...");
+	$("#status").removeClass("error");
 	score_type = null;
 
 	if ($("#competition").val() !== null) {
@@ -120,10 +124,14 @@ function getEvents() {
 					$("#event").append($("<option>").val(event.id).text(event.name).data("event_type", event.type));
 				});
 				$("#event").prop("disabled", false);
+				$("#status").text("Ready.");
+				$("#status").removeClass("error");
 			},
 			"json"
 		).fail(function () {
 			alert("An error occurred getting the events.");
+			$("#status").text("An error occurred getting the events.");
+			$("#status").addClass("error");
 		});
 	}
 }
@@ -136,6 +144,8 @@ function getClubs() {
 	$("#score_errors_value").prop("disabled", true).val("");
 	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
+	$("#status").text("Loading...");
+	$("#status").removeClass("error");
 
 	if ($("#year").val() !== null) {
 		$.post(
@@ -149,10 +159,14 @@ function getClubs() {
 					$("#club").append($("<option>").val(club.id).text(club.name));
 				});
 				$("#club").prop("disabled", false);
+				$("#status").text("Ready.");
+				$("#status").removeClass("error");
 			},
 			"json"
 		).fail(function () {
 			alert("An error occurred getting the clubs.");
+			$("#status").text("An error occurred getting the clubs.");
+			$("#status").addClass("error");
 		});
 	}
 }
@@ -164,6 +178,8 @@ function getTeams() {
 	$("#score_errors_value").prop("disabled", true).val("");
 	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
+	$("#status").text("Loading...");
+	$("#status").removeClass("error");
 
 	if ($("#club").val() !== null && $("#competition").val() !== null) {
 		$.post(
@@ -180,10 +196,14 @@ function getTeams() {
 				if (score_type != "individual") {
 					$("#team").prop("disabled", false);
 				}
+				$("#status").text("Ready.");
+				$("#status").removeClass("error");
 			},
 			"json"
 		).fail(function () {
 			alert("An error occurred getting the teams.");
+			$("#status").text("An error occurred getting the teams.");
+			$("#status").addClass("error");
 		});
 	}
 }
@@ -194,6 +214,8 @@ function getScore() {
 	$("#score_errors_value").prop("disabled", true).val("");
 	$("#individual_scores").empty().hide();
 	$("#submit").prop("disabled", true);
+	$("#status").text("Loading...");
+	$("#status").removeClass("error");
 
 	switch (score_type) {
 		case "points":
@@ -213,9 +235,13 @@ function getScore() {
 							$("#score_points_value").val("");
 						}
 						$("#submit").prop("disabled", false);
+						$("#status").text("Ready.");
+						$("#status").removeClass("error");
 					}
 				).fail(function () {
 					alert("An error occurred getting the score.");
+					$("#status").text("An error occurred getting the score.");
+					$("#status").addClass("error");
 				});
 			}
 			break;
@@ -250,9 +276,13 @@ function getScore() {
 							$("#score_errors_value").val("");
 						}
 						$("#submit").prop("disabled", false);
+						$("#status").text("Ready.");
+						$("#status").removeClass("error");
 					}
 				).fail(function () {
 					alert("An error occurred getting the score.");
+					$("#status").text("An error occurred getting the score.");
+					$("#status").addClass("error");
 				});
 			}
 			break;
@@ -277,9 +307,13 @@ function getScore() {
 						$("#individual_scores").append($("<tr>").append($("<td>").text("Points:")).append($("<td>").append($("<input type=\"number\" min=\"0\" step=\"0.01\" />").data("score_entry_id", "").data("score_entry_field", "points"))));
 						$("#individual_scores").show();
 						$("#submit").prop("disabled", false);
+						$("#status").text("Ready.");
+						$("#status").removeClass("error");
 					}
 				).fail(function () {
 					alert("An error occurred getting the score.");
+					$("#status").text("An error occurred getting the score.");
+					$("#status").addClass("error");
 				});
 			}
 			break;
@@ -288,6 +322,7 @@ function getScore() {
 
 function setScore() {
 	$("#status").text("Saving...");
+	$("#status").removeClass("error");
 
 	switch (score_type) {
 		case "points":
@@ -303,10 +338,13 @@ function setScore() {
 					function () {
 						getScore();
 						$("#status").text("Saved.");
+						$("#status").removeClass("error");
 					},
 					"text"
 				).fail(function () {
 					alert("An error occurred setting the score.");
+					$("#status").text("An error occurred setting the score.");
+					$("#status").addClass("error");
 				});
 			}
 			break;
@@ -338,10 +376,13 @@ function setScore() {
 					function () {
 						getScore();
 						$("#status").text("Saved.");
+						$("#status").removeClass("error");
 					},
 					"text"
 				).fail(function () {
 					alert("An error occurred setting the score.");
+					$("#status").text("An error occurred setting the score.");
+					$("#status").addClass("error");
 				});
 			}
 			break;
@@ -365,6 +406,7 @@ function setScore() {
 					function () {
 						getScore();
 						$("#status").text("Saved.");
+						$("#status").removeClass("error");
 					},
 					"text"
 				)

@@ -27,7 +27,8 @@ foreach ($years as $year) {
 echo '</select>';
 //echo '<input type="submit" value="Apply" />';
 echo '</form>';
-echo '<input id="minimal" type="checkbox" oninput="if ($(&quot;#minimal&quot;).is(&quot;:checked&quot;)) $(&quot;main&quot;).addClass(&quot;minimal&quot;); else $(&quot;main&quot;).removeClass(&quot;minimal&quot;);"><label for="minimal">Only show top scores</label></input>';
+echo '<br />';
+echo '<input id="minimal" type="checkbox" oninput="if ($(&quot;#minimal&quot;).is(&quot;:checked&quot;)) $(&quot;main&quot;).addClass(&quot;minimal&quot;); else $(&quot;main&quot;).removeClass(&quot;minimal&quot;);"><label for="minimal"> Only show top scores</label></input>';
 echo '<br />';
 
 if (!isset($_GET['year_id'])) {
@@ -202,7 +203,7 @@ if (count($scores) > 0) {
 		echo htmlescape(number_format(round($score['score'], 2), 2));
 		echo '</td></tr>';
 	}
-	echo '</tbody></table>';
+	echo '</tbody></table><br />';
 } else {
 	echo '<em>No results.</em><br />';
 }
@@ -314,7 +315,7 @@ if (count($competitions) > 0) {
 				echo htmlescape(number_format(round($score['score'], 2), 2));
 				echo '</td></tr>';
 			}
-			echo '</tbody></table>';
+			echo '</tbody></table><br />';
 		} else {
 			echo '<em>No results.</em><br />';
 		}
@@ -385,7 +386,7 @@ if (count($competitions) > 0) {
 				echo htmlescape(round($score['score'], 2));
 				echo '</td></tr>';
 			}
-			echo '</tbody></table>';
+			echo '</tbody></table><br />';
 		} else {
 			echo '<em>No results.</em><br />';
 		}
@@ -480,7 +481,7 @@ if (count($competitions) > 0) {
 						echo htmlescape(round($score['score'], 2));
 						echo '</td></tr>';
 					}
-					echo '</tbody></table>';
+					echo '</tbody></table><br />';
 				} else {
 					echo '<em>No results.</em><br />';
 				}
