@@ -12,9 +12,7 @@ if (!isset($_GET['competition_id'])) {
 }
 
 // disable caching
-header('Cache-Control: no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-header('Cache-Control: post-check=0, pre-check=0', false);
-header('Pragma: no-cache');
+header('Cache-Control: no-store');
 
 // set filetype
 header('Content-Type: text/csv');
