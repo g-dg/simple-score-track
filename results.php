@@ -257,6 +257,10 @@ if (count($competitions) > 0) {
 
 		echo '<h2>Overall Club Averages<span class="minimal-visible minimal-visible-inline"> (Top 5)</span></h2>';
 
+		echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+		echo '<div id="section_'. $section_number .'"><br />';
+		$section_number++;
+
 		$clubs = database_query('SELECT DISTINCT "clubs"."id" AS "id", "clubs"."name" AS "name" FROM "teams" INNER JOIN "clubs" ON "teams"."club" = "clubs"."id" WHERE "teams"."competition" = ? ORDER BY "name";', [(int)$competition['id']]);
 		usort($clubs, function ($a, $b) {
 			return strnatcasecmp($a['name'], $b['name']);
@@ -320,11 +324,17 @@ if (count($competitions) > 0) {
 			echo '<em>No results.</em><br />';
 		}
 
+		echo '</div>';
+
 
 		/******************************************************************************/
 		// Overall Team Rankings
 
 		echo '<h2>Overall Team Rankings<span class="minimal-visible minimal-visible-inline"> (Top 10)</span></h2>';
+
+		echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+		echo '<div id="section_'. $section_number .'"><br />';
+		$section_number++;
 
 		$teams = database_query('SELECT "clubs"."id" AS "club_id", "clubs"."name" AS "club_name", "teams"."id" AS "team_id", "teams"."name" AS "team_name" FROM "teams" INNER JOIN "clubs" ON "teams"."club" = "clubs"."id" WHERE "teams"."competition" = ? ORDER BY "club_name", "team_name";', [(int)$competition['id']]);
 		usort($teams, function ($a, $b) {
@@ -390,6 +400,8 @@ if (count($competitions) > 0) {
 		} else {
 			echo '<em>No results.</em><br />';
 		}
+
+		echo '</div>';
 
 
 		/******************************************************************************/
