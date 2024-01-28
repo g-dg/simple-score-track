@@ -27,7 +27,7 @@ foreach ($years as $year) {
 echo '</select>';
 //echo '<input type="submit" value="Apply" />';
 echo '</form>';
-echo '<input id="minimal" type="checkbox" oninput="if ($(&quot;#minimal&quot;).is(&quot;:checked&quot;)) $(&quot;main&quot;).addClass(&quot;minimal&quot;); else $(&quot;main&quot;).removeClass(&quot;minimal&quot;);"><label for="minimal">Minimal</label></input>';
+echo '<input id="minimal" type="checkbox" oninput="if ($(&quot;#minimal&quot;).is(&quot;:checked&quot;)) $(&quot;main&quot;).addClass(&quot;minimal&quot;); else $(&quot;main&quot;).removeClass(&quot;minimal&quot;);"><label for="minimal">Only show top scores</label></input>';
 echo '<br />';
 
 if (!isset($_GET['year_id'])) {
@@ -133,6 +133,8 @@ function getOverallYearScoreForClub($club_id)
 	return $score;
 }
 
+$section_number = 0;
+
 /******************************************************************************/
 // Overall per-year results
 
@@ -159,7 +161,11 @@ usort($scores, function ($a, $b) {
 	}
 });
 
-echo '<h1>Overall Scores</h1>';
+echo '<h1>Overall Scores<span class="minimal-visible minimal-visible-inline"> (Top 5)</span></h1>';
+
+echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+echo '<div id="section_'. $section_number .'"><br />';
+$section_number++;
 
 if (count($scores) > 0) {
 	echo '<table class="ranking"><thead><tr><th>Rank</th><th>Club</th><th>Score</th></tr></thead><tbody>';
@@ -201,6 +207,8 @@ if (count($scores) > 0) {
 	echo '<em>No results.</em><br />';
 }
 
+echo '</div>';
+
 
 /******************************************************************************/
 // Competition
@@ -210,6 +218,10 @@ if (count($competitions) > 0) {
 	foreach ($competitions as $competition) {
 
 		echo '<br /><hr /><h1>' . htmlescape($competition['name']) . '</h1>';
+
+		echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+		echo '<div id="section_'. $section_number .'" class="minimal-hidden"><br />';
+		$section_number++;
 
 		/******************************************************************************/
 		// General Statistics
@@ -242,7 +254,7 @@ if (count($competitions) > 0) {
 		/******************************************************************************/
 		// Overall Club Averages
 
-		echo '<h2>Overall Club Averages</h2>';
+		echo '<h2>Overall Club Averages<span class="minimal-visible minimal-visible-inline"> (Top 5)</span></h2>';
 
 		$clubs = database_query('SELECT DISTINCT "clubs"."id" AS "id", "clubs"."name" AS "name" FROM "teams" INNER JOIN "clubs" ON "teams"."club" = "clubs"."id" WHERE "teams"."competition" = ? ORDER BY "name";', [(int)$competition['id']]);
 		usort($clubs, function ($a, $b) {
@@ -311,7 +323,7 @@ if (count($competitions) > 0) {
 		/******************************************************************************/
 		// Overall Team Rankings
 
-		echo '<h2>Overall Team Rankings</h2>';
+		echo '<h2>Overall Team Rankings<span class="minimal-visible minimal-visible-inline"> (Top 10)</span></h2>';
 
 		$teams = database_query('SELECT "clubs"."id" AS "club_id", "clubs"."name" AS "club_name", "teams"."id" AS "team_id", "teams"."name" AS "team_name" FROM "teams" INNER JOIN "clubs" ON "teams"."club" = "clubs"."id" WHERE "teams"."competition" = ? ORDER BY "club_name", "team_name";', [(int)$competition['id']]);
 		usort($teams, function ($a, $b) {
@@ -396,7 +408,11 @@ if (count($competitions) > 0) {
 
 		if (count($events) > 0) {
 			foreach ($events as $event) {
-				echo '<h3>' . htmlescape($event['name']) . '</h3>';
+				echo '<h3>' . htmlescape($event['name']) . '<span class="minimal-visible minimal-visible-inline"> (Top 3)</span></h3>';
+
+				echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+				echo '<div id="section_'. $section_number .'"><br />';
+				$section_number++;
 
 				$scores = [];
 				foreach ($teams as $team) {
@@ -468,6 +484,8 @@ if (count($competitions) > 0) {
 				} else {
 					echo '<em>No results.</em><br />';
 				}
+
+				echo '</div>';
 			}
 		} else {
 			echo '<em>No events.</em><br />';
@@ -475,6 +493,8 @@ if (count($competitions) > 0) {
 		echo '<br />';
 
 		/******************************************************************************/
+
+		echo '</div>';
 
 	}
 } else {

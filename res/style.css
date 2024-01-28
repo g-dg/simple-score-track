@@ -188,3 +188,12 @@ form.form textarea {
 .minimal .minimal-hidden {
 	display: none;
 }
+.minimal-visible {
+	display: none;
+}
+.minimal .minimal-visible {
+	display: block;
+}
+.minimal .minimal-visible-inline {
+	display: inline;
+}
