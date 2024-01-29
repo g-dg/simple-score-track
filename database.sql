@@ -26,7 +26,8 @@ CREATE TABLE "years" (
 CREATE TABLE "clubs" (
 	"id" INTEGER PRIMARY KEY,
 	"year" INTEGER NOT NULL REFERENCES "years" ON UPDATE CASCADE ON DELETE CASCADE,
-	"name" TEXT NOT NULL UNIQUE
+	"name" TEXT NOT NULL,
+	UNIQUE("year", "name")
 );
 
 CREATE TABLE "competitions" (
