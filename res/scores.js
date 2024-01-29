@@ -59,8 +59,21 @@ $(function () {
 
 	$(document).on("ajaxError", function () {
 		alert("An error occurred.");
-		$("#status").text("An error occurred.");
+		$("#status").text("An error occurred!");
 		$("#status").addClass("error");
+	});
+
+	$("#score_points_value").on("input", function() {
+		$("#status").text("*** Unsaved changes! ***");
+		$("#status").removeClass("error");
+	});
+	$("#score_time_value").on("input", function() {
+		$("#status").text("*** Unsaved changes! ***");
+		$("#status").removeClass("error");
+	});
+	$("#score_errors_value").on("input", function() {
+		$("#status").text("*** Unsaved changes! ***");
+		$("#status").removeClass("error");
 	});
 });
 
@@ -94,8 +107,8 @@ function getCompetitions() {
 			},
 			"json"
 		).fail(function () {
-			alert("An error occurred getting the competitions.");
-			$("#status").text("An error occurred getting the competitions.");
+			alert("An error occurred getting the competitions!");
+			$("#status").text("An error occurred getting the competitions!");
 			$("#status").addClass("error");
 		});
 	}
@@ -129,8 +142,8 @@ function getEvents() {
 			},
 			"json"
 		).fail(function () {
-			alert("An error occurred getting the events.");
-			$("#status").text("An error occurred getting the events.");
+			alert("An error occurred getting the events!");
+			$("#status").text("An error occurred getting the events!");
 			$("#status").addClass("error");
 		});
 	}
@@ -164,8 +177,8 @@ function getClubs() {
 			},
 			"json"
 		).fail(function () {
-			alert("An error occurred getting the clubs.");
-			$("#status").text("An error occurred getting the clubs.");
+			alert("An error occurred getting the clubs!");
+			$("#status").text("An error occurred getting the clubs!");
 			$("#status").addClass("error");
 		});
 	}
@@ -201,8 +214,8 @@ function getTeams() {
 			},
 			"json"
 		).fail(function () {
-			alert("An error occurred getting the teams.");
-			$("#status").text("An error occurred getting the teams.");
+			alert("An error occurred getting the teams!");
+			$("#status").text("An error occurred getting the teams!");
 			$("#status").addClass("error");
 		});
 	}
@@ -239,8 +252,8 @@ function getScore() {
 						$("#status").removeClass("error");
 					}
 				).fail(function () {
-					alert("An error occurred getting the score.");
-					$("#status").text("An error occurred getting the score.");
+					alert("An error occurred getting the score!");
+					$("#status").text("An error occurred getting the score!");
 					$("#status").addClass("error");
 				});
 			}
@@ -280,8 +293,8 @@ function getScore() {
 						$("#status").removeClass("error");
 					}
 				).fail(function () {
-					alert("An error occurred getting the score.");
-					$("#status").text("An error occurred getting the score.");
+					alert("An error occurred getting the score!");
+					$("#status").text("An error occurred getting the score!");
 					$("#status").addClass("error");
 				});
 			}
@@ -311,8 +324,8 @@ function getScore() {
 						$("#status").removeClass("error");
 					}
 				).fail(function () {
-					alert("An error occurred getting the score.");
-					$("#status").text("An error occurred getting the score.");
+					alert("An error occurred getting the score!");
+					$("#status").text("An error occurred getting the score!");
 					$("#status").addClass("error");
 				});
 			}
@@ -336,14 +349,14 @@ function setScore() {
 						_csrf_token: $("#csrf_token").val()
 					},
 					function () {
-						getScore();
 						$("#status").text("Saved.");
 						$("#status").removeClass("error");
+						getScore();
 					},
 					"text"
 				).fail(function () {
-					alert("An error occurred setting the score.");
-					$("#status").text("An error occurred setting the score.");
+					alert("An error occurred setting the score!");
+					$("#status").text("An error occurred setting the score!");
 					$("#status").addClass("error");
 				});
 			}
@@ -374,14 +387,14 @@ function setScore() {
 						_csrf_token: $("#csrf_token").val()
 					},
 					function () {
-						getScore();
 						$("#status").text("Saved.");
 						$("#status").removeClass("error");
+						getScore();
 					},
 					"text"
 				).fail(function () {
-					alert("An error occurred setting the score.");
-					$("#status").text("An error occurred setting the score.");
+					alert("An error occurred setting the score!");
+					$("#status").text("An error occurred setting the score!");
 					$("#status").addClass("error");
 				});
 			}
@@ -404,9 +417,9 @@ function setScore() {
 						_csrf_token: $("#csrf_token").val()
 					},
 					function () {
-						getScore();
 						$("#status").text("Saved.");
 						$("#status").removeClass("error");
+						getScore();
 					},
 					"text"
 				)
