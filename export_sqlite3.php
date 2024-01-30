@@ -4,28 +4,29 @@ require_once('session.php');
 require_once('auth.php');
 require_once('database.php');
 
-if (isset($_POST['_csrf_token']) && $_POST['_csrf_token'] === $_SESSION['csrf_token']) {
-	header('Content-Type: application/vnd.sqlite3');
-	header('Content-Disposition: attachment; filename=scores_' . date("YmdHis") . '.sqlite3');
-	header('Cache-Control: no-store');
+header('Content-Type: application/vnd.sqlite3');
+header('Content-Disposition: attachment; filename=scores_' . date("YmdHis") . '.sqlite3');
+header('Cache-Control: no-store');
 
-	$export_db_path = tempnam(sys_get_temp_dir(), '');
+$export_db_path = tempnam(sys_get_temp_dir(), '');
 
-	$export_db_conn = new PDO('sqlite:' . $export_db_path);
+$export_db_conn = new PDO('sqlite:' . $export_db_path);
 
-	$export_db_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$export_db_conn->setAttribute(PDO::ATTR_TIMEOUT, 60);
-	$export_db_conn->exec('PRAGMA journal_mode=WAL;');
-	$export_db_conn->exec('PRAGMA synchronous=NORMAL;');
-	$export_db_conn->exec('PRAGMA busy_timeout = 60000;');
-	$export_db_conn->exec('PRAGMA foreign_keys = ON;');
+$export_db_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$export_db_conn->setAttribute(PDO::ATTR_TIMEOUT, 60);
+$export_db_conn->exec('PRAGMA max_page_count = 4294967294;');
+$export_db_conn->exec('PRAGMA page_size = 512;');
+$export_db_conn->exec('PRAGMA journal_mode = WAL;');
+$export_db_conn->exec('PRAGMA synchronous = NORMAL;');
+$export_db_conn->exec('PRAGMA busy_timeout = 60000;');
+$export_db_conn->exec('PRAGMA foreign_keys = ON;');
 
-	$database_connection->beginTransaction();
+$database_connection->beginTransaction();
 
-	try {
-		$export_db_conn->beginTransaction();
+try {
+	$export_db_conn->beginTransaction();
 
-		$export_db_conn->exec('
+	$export_db_conn->exec('
 CREATE TABLE "years" (
 	"id" INTEGER PRIMARY KEY,
 	"name" TEXT NOT NULL UNIQUE
@@ -97,48 +98,45 @@ CREATE TABLE "individual_scores" (
 );
 ');
 
-		foreach ([
-			'years',
-			'clubs',
-			'competitions',
-			'teams',
-			'events',
-			'point_scores',
-			'timed_event_details',
-			'timed_scores',
-			'individual_scores',
-		] as $table_name) {
-			$select_stmt = $database_connection->prepare('SELECT * FROM "' . $table_name . '";');
-			$select_stmt->execute();
+	foreach ([
+		'years',
+		'clubs',
+		'competitions',
+		'teams',
+		'events',
+		'point_scores',
+		'timed_event_details',
+		'timed_scores',
+		'individual_scores',
+	] as $table_name) {
+		$select_stmt = $database_connection->prepare('SELECT * FROM "' . $table_name . '";');
+		$select_stmt->execute();
 
-			$insert_stmt = null;
-			while ($row = $select_stmt->fetch(PDO::FETCH_NUM)) {
-				if ($insert_stmt == null) {
-					$column_count = count($row);
-					$insert_stmt = $export_db_conn->prepare('INSERT INTO "' . $table_name . '" VALUES (' . str_repeat('?, ', $column_count - 1) . ' ?);');
-				}
-
-				$insert_stmt->execute($row);
-				$insert_stmt->closeCursor();
+		$insert_stmt = null;
+		while ($row = $select_stmt->fetch(PDO::FETCH_NUM)) {
+			if ($insert_stmt == null) {
+				$column_count = count($row);
+				$insert_stmt = $export_db_conn->prepare('INSERT INTO "' . $table_name . '" VALUES (' . str_repeat('?, ', $column_count - 1) . ' ?);');
 			}
-			$select_stmt->closeCursor();
 
-			$select_stmt = null;
-			$insert_stmt = null;
+			$insert_stmt->execute($row);
+			$insert_stmt->closeCursor();
 		}
+		$select_stmt->closeCursor();
 
-		$export_db_conn->commit();
-	} catch (PDOException $e) {
-		$export_db_conn->rollBack();
+		$select_stmt = null;
+		$insert_stmt = null;
 	}
 
-	$database_connection->commit();
-
-	$export_db_conn = null;
-
-	readfile($export_db_path);
-
-	unlink($export_db_path);
-} else {
-	http_response_code(400);
+	$export_db_conn->commit();
+} catch (PDOException $e) {
+	$export_db_conn->rollBack();
 }
+
+$database_connection->commit();
+
+$export_db_conn = null;
+
+readfile($export_db_path);
+
+unlink($export_db_path);
