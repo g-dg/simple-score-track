@@ -24,6 +24,9 @@ if (isset($_GET['year_id'])) {
 
 template_header($year_name !== null ? $year_name . ' - Results' : 'Results');
 
+echo date("Y-m-d H:i:s T");
+echo '<br /><br />';
+
 $years = database_query('SELECT "id", "name" FROM "years" ORDER BY "name";');
 usort($years, function ($a, $b) {
 	return strnatcasecmp($a['name'], $b['name']);
