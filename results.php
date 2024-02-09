@@ -1,5 +1,8 @@
 <?php
 
+error_reporting(E_ALL);
+ini_set('display_errors', 'On');
+
 require_once('constants.php');
 require_once('session.php');
 require_once('auth.php');
@@ -12,13 +15,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['year_id'])) {
 
 require_once('template.php');
 
-template_header('Results');
+$year_name = null;
+if (isset($_GET['year_id'])) {
+	$year_result = database_query('SELECT "name" FROM "years" WHERE "id" = ?;', [(int)$_GET['year_id']]);
+	$year = count($year_result) > 0 ? $year_result[0] : null;
+	$year_name = $year != null ? $year['name'] : null;
+}
+
+template_header($year_name !== null ? $year_name . ' - Results' : 'Results');
 
 $years = database_query('SELECT "id", "name" FROM "years" ORDER BY "name";');
 usort($years, function ($a, $b) {
 	return strnatcasecmp($a['name'], $b['name']);
 });
-echo '<form id="year_select_form" action="results.php" method="post">';
+echo '<form id="year_select_form" action="results.php" method="post" class="no-print">';
 echo '<select name="year_id" required="required" onchange="$(&quot;#year_select_form&quot;).submit();">';
 echo '<option value="" ' . (!isset($_GET['year_id']) ? 'selected="selected"' : '') . ' disabled="disabled">-- Select Year --</option>';
 foreach ($years as $year) {
@@ -28,8 +38,9 @@ echo '</select>';
 //echo '<input type="submit" value="Apply" />';
 echo '</form>';
 echo '<br />';
+echo '<div class="no-print">';
 echo '<input id="minimal" type="checkbox" oninput="if ($(&quot;#minimal&quot;).is(&quot;:checked&quot;)) $(&quot;main&quot;).addClass(&quot;minimal&quot;); else $(&quot;main&quot;).removeClass(&quot;minimal&quot;);"><label for="minimal"> Only show top scores</label></input>';
-echo '<br />';
+echo '</div>';
 
 if (!isset($_GET['year_id'])) {
 	template_footer();
@@ -164,7 +175,7 @@ usort($scores, function ($a, $b) {
 
 echo '<h1>Overall Scores<span class="minimal-visible minimal-visible-inline"> (Top 5)</span></h1>';
 
-echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();" class="no-print">Show/Hide</button>';
 echo '<div id="section_'. $section_number .'"><br />';
 $section_number++;
 
@@ -220,7 +231,7 @@ if (count($competitions) > 0) {
 
 		echo '<br /><hr /><h1>' . htmlescape($competition['name']) . '</h1>';
 
-		echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+		echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();" class="no-print">Show/Hide</button>';
 		echo '<div id="section_'. $section_number .'" class="minimal-hidden"><br />';
 		$section_number++;
 
@@ -257,7 +268,7 @@ if (count($competitions) > 0) {
 
 		echo '<h2>Overall Club Averages<span class="minimal-visible minimal-visible-inline"> (Top 5)</span></h2>';
 
-		echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+		echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();" class="no-print">Show/Hide</button>';
 		echo '<div id="section_'. $section_number .'"><br />';
 		$section_number++;
 
@@ -332,7 +343,7 @@ if (count($competitions) > 0) {
 
 		echo '<h2>Overall Team Rankings<span class="minimal-visible minimal-visible-inline"> (Top 10)</span></h2>';
 
-		echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+		echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();" class="no-print">Show/Hide</button>';
 		echo '<div id="section_'. $section_number .'"><br />';
 		$section_number++;
 
@@ -423,7 +434,7 @@ if (count($competitions) > 0) {
 			foreach ($events as $event) {
 				echo '<h3>' . htmlescape($event['name']) . '<span class="minimal-visible minimal-visible-inline"> (Top 3)</span></h3>';
 
-				echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();">Show/Hide</button>';
+				echo '<button onclick="$(&quot;#section_' . $section_number . '&quot;).toggle();" class="no-print">Show/Hide</button>';
 				echo '<div id="section_'. $section_number .'"><br />';
 				$section_number++;
 

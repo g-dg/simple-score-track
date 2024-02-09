@@ -23,7 +23,7 @@ function template_header($title = null, $header = true, $additional_header_html 
 	echo '</head>';
 	echo '<body>';
 	if ($header) {
-		echo '<nav>';
+		echo '<nav class="no-print">';
 		echo '<ul>';
 		echo '<li><a href="results.php">Results</a></li>';
 		echo '<li><a href="scores.php">Score Entry</a></li>';
@@ -46,7 +46,10 @@ function template_header($title = null, $header = true, $additional_header_html 
 
 function template_footer()
 {
-	echo '<footer>' . APPLICATION_COPYRIGHT_HTML . '</footer>';
+	echo '<footer>';
+	echo '<address class="print-only">Scores calculated by Garnet Degelder\'s Simple Score Tracker: <a href="https://github.com/g-dg/simple-score-track">https://github.com/g-dg/simple-score-track</a><br /><br /></address>';
+	echo APPLICATION_COPYRIGHT_HTML;
+	echo '</footer>';
 	echo '</main>';
 	echo '</body>';
 	echo '</html>';

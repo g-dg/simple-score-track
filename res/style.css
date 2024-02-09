@@ -65,6 +65,11 @@ footer {
 	padding: 8px;
 	color: #333;
 }
+@media print {
+	main {
+		top: 0px;
+	}
+}
 
 hr {
 	border: none;
@@ -196,4 +201,16 @@ form.form textarea {
 }
 .minimal .minimal-visible-inline {
 	display: inline;
+}
+
+.print-only {
+	display: none;
+}
+@media print {
+	.print-only {
+		display: block;
+	}
+	.no-print {
+		display: none;
+	}
 }
