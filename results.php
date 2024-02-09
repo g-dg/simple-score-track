@@ -528,4 +528,6 @@ if (count($competitions) > 0) {
 	echo '<em>No competitions</em><br />';
 }
 
+echo '<address class="print-only">Scores calculated by Garnet Degelder\'s Simple Score Tracker: <a href="https://github.com/g-dg/simple-score-track">https://github.com/g-dg/simple-score-track</a><br /><br /></address>';
+
 template_footer();

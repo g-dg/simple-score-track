@@ -47,7 +47,6 @@ function template_header($title = null, $header = true, $additional_header_html 
 function template_footer()
 {
 	echo '<footer>';
-	echo '<address class="print-only">Scores calculated by Garnet Degelder\'s Simple Score Tracker: <a href="https://github.com/g-dg/simple-score-track">https://github.com/g-dg/simple-score-track</a><br /><br /></address>';
 	echo APPLICATION_COPYRIGHT_HTML;
 	echo '</footer>';
 	echo '</main>';
